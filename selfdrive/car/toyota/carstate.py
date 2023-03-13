@@ -5,11 +5,12 @@ from common.conversions import Conversions as CV
 from common.numpy_fast import mean
 from common.filter_simple import FirstOrderFilter
 from common.params import Params
-from common.realtime import DT_CTRL
+from common.realtime import DT_CTRL, sec_since_boot
 from opendbc.can.can_define import CANDefine
 from opendbc.can.parser import CANParser
 from selfdrive.car.interfaces import CarStateBase
 from selfdrive.car.toyota.values import ToyotaFlags, CAR, DBC, STEER_THRESHOLD, NO_STOP_TIMER_CAR, TSS2_CAR, RADAR_ACC_CAR, EPS_SCALE, UNSUPPORTED_DSU_CAR
+from system.swaglog import cloudlog
 
 
 class CarState(CarStateBase):
@@ -24,15 +25,24 @@ class CarState(CarStateBase):
     # On cars with cp.vl["STEER_TORQUE_SENSOR"]["STEER_ANGLE"]
     # the signal is zeroed to where the steering angle is at start.
     # Need to apply an offset as soon as the steering angle measurements are both received
-    self.accurate_steer_angle_seen = False
-    self.angle_offset = FirstOrderFilter(None, 60.0, DT_CTRL, initialized=False)
-
-    self.low_speed_lockout = False
     self.acc_type = 1
-    self.lkas_hud = {}
-
+    self.accurate_steer_angle_seen = CP.carFingerprint in TSS2_CAR # All TSS2 car have the accurate sensor
+    self.angle_offset_torque = 0.
+    self.angle_offset_zss = 0.
+    self.count = 0
+    self.cruise_active = False
+    self.cruise_active_previous = False
     self.distance_btn = 0
+    self.lkas_hud = {}
     self.lkas_previously_pressed = False
+    self.low_speed_lockout = False
+    self.needs_angle_offset_torque = CP.carFingerprint not in TSS2_CAR # Offset only if needed
+    self.needs_angle_offset_zss = True # ZSS always needs offset
+    self.out_of_tolerance_counter = 0
+    self.steertype = 0 # For debug purposes. 0 = Undefined, 1 = Stock, 2 = Torque, 3 = Zorro
+    self.stock_steer_value = 0.
+    self.torque_steer_value = 0.
+    self.zorro_steer_value = 0.
 
     self.params = Params()
     self.steering_wheel = self.params.get_bool("ExperimentalModeSteeringWheel")
@@ -76,13 +86,68 @@ class CarState(CarStateBase):
       self.accurate_steer_angle_seen = True
 
     if self.accurate_steer_angle_seen:
-      # Offset seems to be invalid for large steering angles
+      # compute offset for torque steer
       if abs(ret.steeringAngleDeg) < 90 and cp.can_valid:
-        self.angle_offset.update(torque_sensor_angle_deg - ret.steeringAngleDeg)
+        if self.needs_angle_offset_torque:
+          self.needs_angle_offset_torque = False
+          self.angle_offset_torque = torque_sensor_angle_deg - ret.steeringAngleDeg
+        ret.steeringAngleOffsetDeg = self.angle_offset_torque
+        ret.steeringAngleDeg = torque_sensor_angle_deg - self.angle_offset_torque
 
-      if self.angle_offset.initialized:
-        ret.steeringAngleOffsetDeg = self.angle_offset.x
-        ret.steeringAngleDeg = torque_sensor_angle_deg - self.angle_offset.x
+    if cp.vl["PCM_CRUISE"]["CRUISE_ACTIVE"] and not self.cruise_active_previous:
+      self.needs_angle_offset_zss = True # cruise was just activated, so allow offset to be recomputed
+      self.out_of_tolerance_counter = 0 # Allow ZSS re-use after disengage and re-engage
+    self.cruise_active_previous = bool(cp.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
+
+    if self.CP.hasZss:
+      # Compute offset for zorro steer
+      if self.needs_angle_offset_zss:
+        angle_wheel = cp.vl["STEER_ANGLE_SENSOR"]["STEER_ANGLE"] + cp.vl["STEER_ANGLE_SENSOR"]["STEER_FRACTION"]
+        if (abs(angle_wheel) > 1e-3 and abs(cp.vl["SECONDARY_STEER_ANGLE"]["ZORRO_STEER"]) > 1e-3):
+          self.needs_angle_offset_zss = False
+          self.angle_offset_zss = cp.vl["SECONDARY_STEER_ANGLE"]["ZORRO_STEER"] - angle_wheel
+      self.zorro_steer_value = cp.vl["SECONDARY_STEER_ANGLE"]["ZORRO_STEER"] - self.angle_offset_zss
+
+      # Default to stock if 1) Too many instances of steering being out of tolerance; something is not right
+      #                    2) Zorro steer offset has not been computed
+      if self.out_of_tolerance_counter < 10 and not self.needs_angle_offset_zss:
+        #check if zorro steer is out of tolerance
+        if abs(self.stock_steer_value - self.zorro_steer_value) > 4.0:
+          ret.steeringAngleDeg = self.stock_steer_value
+          self.steertype = 1
+          if self.cruise_active:
+            self.out_of_tolerance_counter = self.out_of_tolerance_counter + 1 # Should not get here too often with cruise active
+        else:
+          ret.steeringAngleDeg= self.zorro_steer_value
+          self.steertype = 3
+      else:
+        ret.steeringAngleDeg = self.stock_steer_value
+        self.steertype = 1
+    elif self.accurate_steer_angle_seen:
+      ret.steeringAngleDeg = self.torque_steer_value
+      self.steertype = 2
+    else:
+      ret.steeringAngleDeg = self.stock_steer_value
+      self.steertype = 1
+
+    if (self.count % int(1.0 / DT_CTRL)) == 0:
+      cloudlog.info("*** Zorro       *** %s" % self.zorro_steer_value)
+      cloudlog.info("*** Torque      *** %s" % self.torque_steer_value)
+      cloudlog.info("*** Stock       *** %s" % self.stock_steer_value)
+      cloudlog.info("*** Num of OTs  *** %s" % self.out_of_tolerance_counter)
+      cloudlog.info("*** OP is Using *** %s" % ret.steeringAngleDeg)
+      steertypeText = "Undefined" #should never happen
+      if self.steertype == 1:
+        steertypeText = "Stock"
+      elif self.steertype == 2:
+        steertypeText = "Torque"
+      elif self.steertype == 3:
+        steertypeText = "Zorro"
+      cloudlog.info("====================================")
+      cloudlog.info("******* Using Steer Type: ******* %s" % steertypeText)
+      cloudlog.info("====================================")
+
+    self.count = self.count + 1
 
     ret.steeringRateDeg = cp.vl["STEER_ANGLE_SENSOR"]["STEER_RATE"]
 
@@ -247,6 +312,10 @@ class CarState(CarStateBase):
       signals.append(("ACC_FAULTED", "PCM_CRUISE_2"))
       signals.append(("LOW_SPEED_LOCKOUT", "PCM_CRUISE_2"))
       checks.append(("PCM_CRUISE_2", 33))
+
+    if CP.hasZss:
+      signals += [("ZORRO_STEER", "SECONDARY_STEER_ANGLE", 0)]
+      checks += [("SECONDARY_STEER_ANGLE", 0)]
 
     # add gas interceptor reading if we are using it
     if CP.enableGasInterceptor:

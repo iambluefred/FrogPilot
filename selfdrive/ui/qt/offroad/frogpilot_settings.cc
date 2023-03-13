@@ -30,7 +30,8 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"RotatingWheel", "Rotating Steering Wheel", "The steering wheel in top right corner of the onroad UI rotates alongside your physical steering wheel.", "../assets/offroad/icon_rotate.png"},
     {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"},
     {"SteeringWheel", "Steering Wheel Icon", "Replace the stock openpilot steering wheel icon with a custom icon.", "../assets/offroad/icon_openpilot.png"},
-    {"WideCameraDisable", "Wide Camera Overridden", "Turns off the wide camera from displaying while onroad. This toggle is purely cosmetic and won't prevent openpilot from using the wide camera.", "../assets/offroad/icon_camera.png"}
+    {"WideCameraDisable", "Wide Camera Overridden", "Turns off the wide camera from displaying while onroad. This toggle is purely cosmetic and won't prevent openpilot from using the wide camera.", "../assets/offroad/icon_camera.png"},
+    {"ZSS", "Zorro Steering Sensor", "Takes advantage of the 'Zorro Steering Sensor' for those who have it installed in their Prius.", "../assets/offroad/icon_zorro.png"}
   };
 
   for (int i = 0; i < toggles.size(); i++) {

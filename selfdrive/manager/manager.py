@@ -82,6 +82,7 @@ def manager_init() -> None:
     ("SteeringWheel", "1"),
     ("UnlimitedLength", "1"),
     ("WideCameraDisable", "1"),
+    ("ZSS", "0"),
   ]
   if not PC:
     default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))

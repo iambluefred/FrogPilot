@@ -226,6 +226,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"VisionRadarToggle", PERSISTENT},
     {"WideCameraDisable", PERSISTENT},
     {"WideCameraOnly", PERSISTENT},
+    {"ZSS", PERSISTENT},
     {"ApiCache_Device", PERSISTENT},
     {"ApiCache_DriveStats", PERSISTENT},
     {"ApiCache_NavDestinations", PERSISTENT},
