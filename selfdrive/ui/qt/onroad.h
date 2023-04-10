@@ -62,6 +62,7 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(int status MEMBER status);
 
   Q_PROPERTY(bool frogColors MEMBER frogColors);
+  Q_PROPERTY(bool muteDM MEMBER muteDM);
 
 public:
   explicit AnnotatedCameraWidget(VisionStreamType type, QWidget* parent = 0);
@@ -87,6 +88,7 @@ private:
   bool has_eu_speed_limit = false;
   bool v_ego_cluster_seen = false;
   bool frogColors;
+  bool muteDM;
   int status = STATUS_DISENGAGED;
   std::unique_ptr<PubMaster> pm;
 

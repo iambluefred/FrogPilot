@@ -127,6 +127,7 @@ typedef struct UIScene {
   bool frog_colors;
   bool full_brightness;
   bool isFrogTheme;
+  bool mute_dm;
   bool wide_camera_disable;
 
 } UIScene;

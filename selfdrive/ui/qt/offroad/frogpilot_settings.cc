@@ -18,6 +18,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"},
     {"DisableAd", "Disable comma prime Ad", "Disables the comma prime ad.", "../assets/offroad/icon_minus.png"},
     {"DisableInternetCheck", "Disable Internet Check", "Allows the device to be offline indefinitely.", "../assets/offroad/icon_warning.png"},
+    {"FireTheBabysitter", "Fire the Babysitter", "Disable some of openpilot's 'Babysitter Protocols'.", "../assets/offroad/icon_babysitter.png"},
     {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"},
     {"WideCameraDisable", "Wide Camera Overridden", "Turns off the wide camera from displaying while onroad. This toggle is purely cosmetic and won't prevent openpilot from using the wide camera.", "../assets/offroad/icon_camera.png"}
   };
@@ -29,6 +30,12 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
         {"FrogColors", "Enable FrogPilot Colors", "Replace stock openpilot colors with FrogPilot's."},
         {"FrogIcons", "Enable FrogPilot Icons", "Replace stock openpilot icons with FrogPilot's."},
         {"FrogSounds", "Enable FrogPilot Sounds", "Replace stock openpilot sounds with FrogPilot's."}
+      });
+    } else if (key == "FireTheBabysitter") {
+      createSubControl(key, label, desc, icon, {}, {
+        {"MuteDM", "Disable Driver Monitoring", "Disables the driver monitoring system."},
+        {"MuteDoor", "Mute 'Door Open' alert", "Mutes the 'Door Open' alert."},
+        {"MuteSeatbelt", "Mute 'Seatbelt Unlatched' alert", "Mutes the 'Seatbelt Unlatched' alert."}
       });
     } else {
       mainLayout->addWidget(createParamControl(key, label, desc, icon, parent));

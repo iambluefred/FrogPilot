@@ -4,6 +4,7 @@ from cereal import car
 from common.numpy_fast import interp
 from common.realtime import DT_DMON
 from common.filter_simple import FirstOrderFilter
+from common.params import Params
 from common.stat_live import RunningStatFilter
 from common.transformations.camera import tici_d_frame_size
 
@@ -153,6 +154,9 @@ class DriverStatus():
     self.hi_stds = 0
     self.threshold_pre = self.settings._DISTRACTED_PRE_TIME_TILL_TERMINAL / self.settings._DISTRACTED_TIME
     self.threshold_prompt = self.settings._DISTRACTED_PROMPT_TIME_TILL_TERMINAL / self.settings._DISTRACTED_TIME
+
+    self.params = Params()
+    self.mute_dm = self.params.get_bool("FireTheBabysitter") and self.params.get_bool("MuteDM")
 
     self._set_timers(active_monitoring=True)
 
@@ -319,7 +323,7 @@ class DriverStatus():
     if certainly_distracted or maybe_distracted:
       # should always be counting if distracted unless at standstill and reaching orange
       if not standstill_exemption:
-        self.awareness = max(self.awareness - self.step_change, -0.1)
+        self.awareness = 1 if self.mute_dm else max(self.awareness - self.step_change, -0.1)
 
     alert = None
     if self.awareness <= 0.:

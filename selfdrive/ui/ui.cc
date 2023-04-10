@@ -79,7 +79,7 @@ void update_line_data(const UIState *s, const cereal::XYZTData::Reader &line,
   *pvd = left_points + right_points;
 }
 
-void update_model(UIState *s, 
+void update_model(UIState *s,
                   const cereal::ModelDataV2::Reader &model,
                   const cereal::UiPlan::Reader &plan) {
   UIScene &scene = s->scene;
@@ -214,6 +214,7 @@ void ui_update_params(UIState *s) {
   s->scene.full_brightness = params.getBool("100Brightness");
   s->scene.is_metric = params.getBool("IsMetric");
   s->scene.map_on_left = params.getBool("NavSettingLeftSide");
+  s->scene.mute_dm = params.getBool("FireTheBabysitter") && params.getBool("MuteDM");
   s->scene.wide_camera_disable = params.getBool("WideCameraDisable");
 }
 
