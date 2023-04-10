@@ -219,6 +219,7 @@ class Updater:
     self.params = Params()
     self.branches = defaultdict(lambda: '')
     self._has_internet: bool = False
+    self.disable_internet_check = self.params.get_bool("DisableInternetCheck")
 
   @property
   def has_internet(self) -> bool:
@@ -317,9 +318,9 @@ class Updater:
       else:
         extra_text = exception
       set_offroad_alert("Offroad_UpdateFailed", True, extra_text=extra_text)
-    elif dt.days > DAYS_NO_CONNECTIVITY_MAX and failed_count > 1:
+    elif not self.disable_internet_check and dt.days > DAYS_NO_CONNECTIVITY_MAX and failed_count > 1:
       set_offroad_alert("Offroad_ConnectivityNeeded", True)
-    elif dt.days > DAYS_NO_CONNECTIVITY_PROMPT:
+    elif not self.disable_internet_check and dt.days > DAYS_NO_CONNECTIVITY_PROMPT:
       remaining = max(DAYS_NO_CONNECTIVITY_MAX - dt.days, 1)
       set_offroad_alert("Offroad_ConnectivityNeededPrompt", True, extra_text=f"{remaining} day{'' if remaining == 1 else 's'}.")
 

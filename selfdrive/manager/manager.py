@@ -39,6 +39,7 @@ def manager_init() -> None:
     ("6Hour", "1"),
     ("BackButton", "1"),
     ("CompletedTrainingVersion", "0"),
+    ("DisableInternetCheck", "1"),
     ("DisengageOnAccelerator", "0"),
     ("FrogColors", "1"),
     ("FrogIcons", "1"),
