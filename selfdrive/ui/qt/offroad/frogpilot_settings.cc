@@ -23,6 +23,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"NumericalTemp", "Numerical Temperature Gauge", "Replace openpilot's 'GOOD', 'OK', and 'HIGH' temperature statuses with numerical readings.", "../assets/offroad/icon_temp.png"},
     {"RotatingWheel", "Rotating Steering Wheel", "The steering wheel in top right corner of the onroad UI rotates alongside your physical steering wheel.", "../assets/offroad/icon_rotate.png"},
     {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"},
+    {"SteeringWheel", "Steering Wheel Icon", "Replace the stock openpilot steering wheel icon with a custom icon.", "../assets/offroad/icon_openpilot.png"},
     {"WideCameraDisable", "Wide Camera Overridden", "Turns off the wide camera from displaying while onroad. This toggle is purely cosmetic and won't prevent openpilot from using the wide camera.", "../assets/offroad/icon_camera.png"}
   };
 
@@ -45,6 +46,9 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
         {"LaneDetection", "Lane Detection", "Prevents automatic lane changes if no lane is detected to turn into. Helps prevent early lane changes such as preparing for an upcoming left/right turn."},
         {"OneLaneChange", "One Lane Change Per Signal", "Limits nudgeless lane changes to one per turn signal activation. Helps prevent lane changes when preparing for an upcoming left/right turn with no barrier between you and the other side of the road."},
       });
+    } else if (key == "SteeringWheel") {
+      mainLayout->addWidget(new SteeringWheel());
+      mainLayout->addWidget(horizontal_line());
     } else {
       mainLayout->addWidget(createParamControl(key, label, desc, icon, parent));
       if (i != toggles.size() - 1) mainLayout->addWidget(horizontal_line());

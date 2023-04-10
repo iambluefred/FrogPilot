@@ -61,6 +61,7 @@ def manager_init() -> None:
     ("OpenpilotEnabledToggle", "1"),
     ("RotatingWheel", "1"),
     ("Sidebar", "1"),
+    ("SteeringWheel", "1"),
     ("WideCameraDisable", "1"),
   ]
   if not PC:

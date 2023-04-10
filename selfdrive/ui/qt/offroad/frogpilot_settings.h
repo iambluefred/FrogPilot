@@ -2,6 +2,10 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QMap>
+#include <QTimer>
 
 #include "selfdrive/ui/qt/widgets/controls.h"
 
@@ -19,3 +23,59 @@ private:
   QWidget *addSubControls(const QString &parentKey, QVBoxLayout *layout, const std::vector<std::tuple<QString, QString, QString>> &controls);
   void createSubControl(const QString &key, const QString &label, const QString &desc, const QString &icon, const std::vector<QWidget*> &subControls, const std::vector<std::tuple<QString, QString, QString>> &additionalControls = {});
 };
+
+class ParamValueControl : public AbstractControl {
+protected:
+  ParamValueControl(const QString& name, const QString& description, const QString& iconPath) : AbstractControl(name, description, iconPath) {
+    label.setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+    label.setStyleSheet("color: #e0e879");
+    setButtonStyle(btnminus, "-");
+    setButtonStyle(btnplus, "+");
+    hlayout->addWidget(&label);
+    hlayout->addWidget(&btnminus);
+    hlayout->addWidget(&btnplus);
+    connect(&btnminus, &QPushButton::pressed, [this]() { updateValue(-1); minusTimer.start(200); });
+    connect(&btnminus, &QPushButton::released, [this]() { minusTimer.stop(); });
+    connect(&btnplus, &QPushButton::pressed, [this]() { updateValue(1); plusTimer.start(200); });
+    connect(&btnplus, &QPushButton::released, [this]() { plusTimer.stop(); });
+    connect(&minusTimer, &QTimer::timeout, [this]() { updateValue(-1); });
+    connect(&plusTimer, &QTimer::timeout, [this]() { updateValue(1); });
+  }
+
+  void setButtonStyle(QPushButton &btn, const QString &text) {
+    btn.setStyleSheet("QPushButton { background-color: #393939; color: #E4E4E4; border-radius: 50px; font: 500 35px; padding: 0; } QPushButton:pressed { background-color: #4a4a4a; color: #E4E4E4; }");
+    btn.setText(text);
+    btn.setFixedSize(150, 100);
+  }
+
+  QPushButton btnminus, btnplus;
+  QLabel label;
+  Params params;
+  QTimer minusTimer, plusTimer;
+
+  virtual void updateValue(int delta) = 0;
+  virtual void refresh() = 0;
+};
+
+#define ParamController(className, paramName, labelText, descText, iconPath, getValueStrFunc, newValueFunc) \
+class className : public ParamValueControl { \
+  Q_OBJECT \
+public: \
+  className() : ParamValueControl(labelText, descText, iconPath) { refresh(); } \
+private: \
+  QMap<int, QString> wheelLabels = {{0, "Stock"}, {1, "Lexus"}, {2, "Toyota"}, {3, "Frog"}}; \
+  void refresh() override { label.setText(getValueStr()); } \
+  void updateValue(int delta) override { \
+    int value = QString::fromStdString(params.get(paramName)).toInt(); \
+    value = newValue(value + delta); \
+    params.put(paramName, QString::number(value).toStdString()); \
+    refresh(); \
+  } \
+  QString getValueStr() { getValueStrFunc } \
+  int newValue(int v) { newValueFunc } \
+};
+
+ParamController(SteeringWheel, "SteeringWheel", "Steering Wheel Icon", "Replace the stock openpilot steering wheel icon with a custom icon. Requires reboot for changes to take effect. Want to submit your own steering wheel? Message me on Discord: FrogsGoMoo #6969.", "../assets/offroad/icon_openpilot.png",
+  return wheelLabels[QString::fromStdString(params.get("SteeringWheel")).toInt()];,
+  return (v + 4) % 4;
+)

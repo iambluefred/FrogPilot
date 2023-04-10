@@ -181,7 +181,14 @@ ExperimentalButton::ExperimentalButton(QWidget *parent) : QPushButton(parent) {
   setCheckable(true);
 
   params = Params();
-  engage_img = loadPixmap("../assets/img_chffr_wheel.png", {img_size, img_size});
+  wheel = QString::fromStdString(params.get("SteeringWheel"));
+  std::map<QString, QString> wheel_images = {
+    {"0", "../assets/img_chffr_wheel.png"},
+    {"1", "../assets/lexus.png"},
+    {"2", "../assets/toyota.png"},
+    {"3", "../assets/frog_img_spinner_comma.png"}
+  };
+  engage_img = loadPixmap(wheel_images[wheel], {img_size, img_size});
   experimental_img = loadPixmap("../assets/img_experimental.svg", {img_size, img_size});
 
   QObject::connect(this, &QPushButton::toggled, [=](bool checked) {
@@ -212,11 +219,11 @@ void ExperimentalButton::paintEvent(QPaintEvent *event) {
   p.setRenderHint(QPainter::Antialiasing);
 
   QPoint center(btn_size / 2, btn_size / 2);
-  QPixmap img = isChecked() ? experimental_img : engage_img;
+  QPixmap img = wheel > 0 ? engage_img : isChecked() ? experimental_img : engage_img;
 
   p.setOpacity(1.0);
   p.setPen(Qt::NoPen);
-  p.setBrush(QColor(0, 0, 0, 166));
+  p.setBrush(wheel > 0 && isChecked() ? QColor(218, 111, 37, 241) : QColor(0, 0, 0, 166));
   p.drawEllipse(center, btn_size / 2, btn_size / 2);
   p.setOpacity(isDown() ? 0.8 : 1.0);
   p.drawPixmap((btn_size - img_size) / 2, (btn_size - img_size) / 2, img);
@@ -448,11 +455,18 @@ void AnnotatedCameraWidget::drawHud(QPainter &p) {
   p.restore();
 
   if (rotatingWheel) {
-    engage_img = loadPixmap("../assets/img_chffr_wheel.png", {img_size, img_size});
+    wheel = QString::fromStdString(params.get("SteeringWheel"));
+    std::map<QString, QString> wheel_images = {
+      {"0", "../assets/img_chffr_wheel.png"},
+      {"1", "../assets/lexus.png"},
+      {"2", "../assets/toyota.png"},
+      {"3", "../assets/frog_img_spinner_comma.png"}
+    };
+    engage_img = loadPixmap(wheel_images[wheel], {img_size, img_size});
     experimental_img = loadPixmap("../assets/img_experimental.svg", {img_size, img_size});
     SubMaster &sm = *(uiState()->sm);
     drawIconRotate(p, rect().right() - btn_size / 2 - bdr_s * 2 + 25, btn_size / 2 + int(bdr_s * 1.5) - 20,
-                   sm["controlsState"].getControlsState().getExperimentalMode() ? experimental_img : engage_img,
+                   wheel > 0 ? engage_img : sm["controlsState"].getControlsState().getExperimentalMode() ? experimental_img : engage_img,
                    (sm["controlsState"].getControlsState().getExperimentalMode() ? QColor(218, 111, 37, 241) : blackColor(166)), 1.0, steering_angle_deg);
   }
 }

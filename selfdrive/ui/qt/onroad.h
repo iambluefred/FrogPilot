@@ -44,6 +44,7 @@ private:
   bool rotatingWheel;
   QPixmap engage_img;
   QPixmap experimental_img;
+  QString wheel;
 };
 
 // container window for the NVG UI
@@ -99,6 +100,7 @@ private:
   bool rotatingWheel;
   int status = STATUS_DISENGAGED;
   int steering_angle_deg = 0;
+  QString wheel;
   std::unique_ptr<PubMaster> pm;
 
   int skip_frame_count = 0;
