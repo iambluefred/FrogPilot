@@ -1,15 +1,14 @@
-![](https://i.imgur.com/b0ZyIx5.jpg)
+![](https://i.imgur.com/wpNJoJ6.png)
 
 Table of Contents
 =======================
 
 * [What is openpilot?](#what-is-openpilot)
-* [Running in a car](#running-on-a-dedicated-device-in-a-car)
-* [Running on PC](#running-on-pc)
-* [Community and Contributing](#community-and-contributing)
-* [User Data and comma Account](#user-data-and-comma-account)
-* [Safety and Testing](#safety-and-testing)
-* [Directory Structure](#directory-structure)
+* [What is FrogPilot?](#what-is-frogpilot)
+* [Features](#features)
+* [How to Install](#how-to-install)
+* [Bug reports / Feature Requests](#bug-reports--feature-requests)
+* [Credits](#credits)
 * [Licensing](#licensing)
 
 ---
@@ -35,97 +34,84 @@ What is openpilot?
 </table>
 
 
-Running on a dedicated device in a car
+What is FrogPilot? 🐸
 ------
 
-To use openpilot in a car, you need four things
-* A supported device to run this software: a [comma three](https://comma.ai/shop/products/three).
-* This software. The setup procedure of the comma three allows the user to enter a URL for custom software.
-The URL, openpilot.comma.ai will install the release version of openpilot. To install openpilot master, you can use installer.comma.ai/commaai/master, and replacing commaai with another GitHub username can install a fork.
-* One of [the 200+ supported cars](docs/CARS.md). We support Honda, Toyota, Hyundai, Nissan, Kia, Chrysler, Lexus, Acura, Audi, VW, and more. If your car is not supported but has adaptive cruise control and lane-keeping assist, it's likely able to run openpilot.
-* A [car harness](https://comma.ai/shop/products/car-harness) to connect to your car.
+FrogPilot is my custom "Frog Themed" fork of openpilot that has been tailored to improve the driving experience with my 2019 Lexus ES 350. I resync with the latest version of master quite frequently, so this fork is always up to date. I also strive to make every commit I make easy to read and easily cherry-pickable, so feel free to use any of my features in your own personal forks in any way that you see fit!
 
-We have detailed instructions for [how to mount the device in a car](https://comma.ai/setup).
-
-Running on PC
 ------
 
-All openpilot services can run as usual on a PC without requiring special hardware or a car. You can also run openpilot on recorded or simulated data to develop or experiment with openpilot.
+FrogPilot was last resynced to master on:
 
-With openpilot's tools, you can plot logs, replay drives, and watch the full-res camera streams. See [the tools README](tools/README.md) for more information.
+**April 8th, 2023**
 
-You can also run openpilot in simulation [with the CARLA simulator](tools/sim/README.md). This allows openpilot to drive around a virtual car on your Ubuntu machine. The whole setup should only take a few minutes but does require a decent GPU.
-
-A PC running openpilot can also control your vehicle if it is connected to a [webcam](https://github.com/commaai/openpilot/tree/master/tools/webcam), a [black panda](https://comma.ai/shop/products/panda), and a [harness](https://comma.ai/shop/products/car-harness).
-
-Community and Contributing
+Features
 ------
 
-openpilot is developed by [comma](https://comma.ai/) and by users like you. We welcome both pull requests and issues on [GitHub](http://github.com/commaai/openpilot). Bug fixes and new car ports are encouraged. Check out [the contributing docs](docs/CONTRIBUTING.md).
+FrogPilot offers a wide range of customizable features that can be easily toggled on or off to suit your preferences. Whether you want a completely stock openpilot experience or want to add some fun and personal touches, FrogPilot has you covered! Some of the features include:
 
-Documentation related to openpilot development can be found on [docs.comma.ai](https://docs.comma.ai). Information about running openpilot (e.g. FAQ, fingerprinting, troubleshooting, custom forks, community hardware) should go on the [wiki](https://github.com/commaai/openpilot/wiki).
+- Frog theme!
+  - Frog/Green color scheme
+  - Frog icons
+  - Frog sounds (with a bonus Goat sound effect)
+  - Frog turn signals that "hop" along the bottom of your screen
+- Adjustable following distance profiles via the "Distance" button on your steering wheel (Toyota/Lexus only)
+- Allow the device to be offline indefinitely
+- 'Back' button in the settings menu instead of the large 'X'
+- Conditional Experimental Mode
+  - Automatically switch to "Experimental Mode" on curves
+  - Automatically switch to "Experimental Mode" when a turn signal is activated
+  - Automatically switch to "Experimental Mode" when below a specified speed and there is no lead vehicle
+- Custom steering wheel icon. Want to add your own? Message me on Discord at "FrogsGoMoo" #6969
+- Customize the road UI
+  - Increase or decrease the lane line width
+  - Increase or decrease the path width
+  - Increase or decrease the road edges width
+  - Path edges that represent driving statuses (Experimental Mode on, Conditional Overridden, etc.)
+  - "Unlimited" road UI that extends out as far as the model can see
+- Device shuts down after being offroad for 6 hours instead of 30 to help prevent battery drain
+- Disable the wide camera while in Experimental Mode. This effect is purely cosmetic
+- Have the sidebar show by default to monitor your device temperature and connectivity with ease
+- Nudgeless lane changes
+  - Optional one lane change per signal activation
+  - With lane detection to prevent lane changes into curbs or going off road
+- Numerical temperature gauge to replace the "GOOD", "OK", and "HIGH" temperature statuses
+- On screen compass that rotates according to the direction you're facing
+- Personal tune focused around my 2019 Lexus ES (TSS 2.0) which drives a bit more aggressively
+- Screen is always at 100% brightness
+- Steering wheel in the top right corner of the onroad UI rotates alongside your car's steering wheel
+- Toggle Experimental Mode via the "Lane Departure Alert" button on your steering wheel (Toyota/Lexus only)
+- ZSS (Zorro Steering Sensor) Support - *Currently in testing*
 
-You can add support for your car by following guides we have written for [Brand](https://blog.comma.ai/how-to-write-a-car-port-for-openpilot/) and [Model](https://blog.comma.ai/openpilot-port-guide-for-toyota-models/) ports. Generally, a car with adaptive cruise control and lane keep assist is a good candidate. [Join our Discord](https://discord.comma.ai) to discuss car ports: most car makes have a dedicated channel.
-
-Want to get paid to work on openpilot? [comma is hiring](https://comma.ai/jobs/).
-
-And [follow us on Twitter](https://twitter.com/comma_ai).
-
-User Data and comma Account
+How to Install
 ------
 
-By default, openpilot uploads the driving data to our servers. You can also access your data through [comma connect](https://connect.comma.ai/). We use your data to train better models and improve openpilot for everyone.
+Easiest way to install FrogPilot is via this URL at the installation screen:
 
-openpilot is open source software: the user is free to disable data collection if they wish to do so.
+```
+https://installer.comma.ai/FrogAi/FrogPilot
+```
+Be sure to capitalize the "F" and "P" in "FrogPilot" otherwise the installation will fail.
 
-openpilot logs the road-facing cameras, CAN, GPS, IMU, magnetometer, thermal sensors, crashes, and operating system logs.
-The driver-facing camera is only logged if you explicitly opt-in in settings. The microphone is not recorded.
 
-By using openpilot, you agree to [our Privacy Policy](https://comma.ai/privacy). You understand that use of this software or its related services will generate certain types of user data, which may be logged and stored at the sole discretion of comma. By accepting this agreement, you grant an irrevocable, perpetual, worldwide right to comma for the use of this data.
-
-Safety and Testing
-----
-
-* openpilot observes ISO26262 guidelines, see [SAFETY.md](docs/SAFETY.md) for more details.
-* openpilot has software-in-the-loop [tests](.github/workflows/selfdrive_tests.yaml) that run on every commit.
-* The code enforcing the safety model lives in panda and is written in C, see [code rigor](https://github.com/commaai/panda#code-rigor) for more details.
-* panda has software-in-the-loop [safety tests](https://github.com/commaai/panda/tree/master/tests/safety).
-* Internally, we have a hardware-in-the-loop Jenkins test suite that builds and unit tests the various processes.
-* panda has additional hardware-in-the-loop [tests](https://github.com/commaai/panda/blob/master/Jenkinsfile).
-* We run the latest openpilot in a testing closet containing 10 comma devices continuously replaying routes.
-
-Directory Structure
+Bug reports / Feature Requests
 ------
-    .
-    ├── cereal              # The messaging spec and libs used for all logs
-    ├── common              # Library like functionality we've developed here
-    ├── docs                # Documentation
-    ├── opendbc             # Files showing how to interpret data from cars
-    ├── panda               # Code used to communicate on CAN
-    ├── third_party         # External libraries
-    └── system              # Generic services
-        ├── camerad         # Driver to capture images from the camera sensors
-        ├── clocksd         # Broadcasts current time
-        ├── hardware        # Hardware abstraction classes
-        ├── logcatd         # systemd journal as a service
-        ├── loggerd         # Logger and uploader of car data
-        ├── proclogd        # Logs information from /proc
-        ├── sensord         # IMU interface code
-        └── ubloxd          # u-blox GNSS module interface code
-    └── selfdrive           # Code needed to drive the car
-        ├── assets          # Fonts, images, and sounds for UI
-        ├── athena          # Allows communication with the app
-        ├── boardd          # Daemon to talk to the board
-        ├── car             # Car specific code to read states and control actuators
-        ├── controls        # Planning and controls
-        ├── debug           # Tools to help you debug and do car ports
-        ├── locationd       # Precise localization and vehicle parameter estimation
-        ├── manager         # Daemon that starts/stops all other daemons as needed
-        ├── modeld          # Driving and monitoring model runners
-        ├── monitoring      # Daemon to determine driver attention
-        ├── navd            # Turn-by-turn navigation
-        ├── test            # Unit tests, system tests, and a car simulator
-        └── ui              # The UI
+
+If you encounter any issues or bugs while using FrogPilot, or if you have any suggestions for new features or improvements, please don't hesitate to reach out to me. I'm always looking for ways to improve the fork and make it more useful for the community!
+
+To report a bug or request a new feature, you can send me a message on Discord at **"FrogsGoMoo #6969"**. Please provide as much detail as possible about the issue you're experiencing or the feature you'd like to see added. Screenshots, log files, and other relevant information are also helpful.
+
+I will do my best to respond to bug reports and feature requests in a timely manner, but please understand that I may not be able to address every request immediately. Your feedback and suggestions are valuable, and I appreciate your help in making FrogPilot the best it can be!
+
+Credits
+------
+
+* [Aragon7777](https://github.com/Aragon7777/openpilot)
+* [DragonPilot](https://github.com/dragonpilot-community/dragonpilot)
+* [KRKeegan](https://github.com/krkeegan/openpilot)
+* [Move-Fast](https://github.com/move-fast/openpilot)
+* [Sunnyhaibin](https://github.com/sunnyhaibin/sunnypilot)
+* [Twilsonco](https://github.com/twilsonco/openpilot)
 
 Licensing
 ------
