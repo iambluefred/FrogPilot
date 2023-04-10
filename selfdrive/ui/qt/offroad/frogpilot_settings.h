@@ -75,6 +75,26 @@ private: \
   int newValue(int v) { newValueFunc } \
 };
 
+ParamController(LaneLinesWidth, "LaneLinesWidth", "   Lane Line Width", "Customize the lane lines width. Default matches the MUTCD average of 4 inches.", "../assets/offroad/icon_blank.png",
+  return QString::fromStdString(params.get("LaneLinesWidth")) + " inches";,
+  return std::clamp(v, 0, 24);
+)
+
+ParamController(PathEdgeWidth, "PathEdgeWidth", "   Path Edge Width", "Customize the path edge width that displays current driving statuses. Default is 20% of the total path.", "../assets/offroad/icon_blank.png",
+  return QString::fromStdString(params.get("PathEdgeWidth")) + "%";,
+  return std::clamp(v, 0, 100);
+)
+
+ParamController(PathWidth, "PathWidth", "   Path Width", "Customize the path width. Default matches a 2019 Lexus ES 350.", "../assets/offroad/icon_blank.png",
+  return QString::number(QString::fromStdString(params.get("PathWidth")).toDouble() / 10.0) + " feet";,
+  return std::max(0, v);
+)
+
+ParamController(RoadEdgesWidth, "RoadEdgesWidth", "   Road Edges Width", "Customize the road edges width. Default is 1/2 of the MUTCD average lane line width of 4 inches.", "../assets/offroad/icon_blank.png",
+  return QString::fromStdString(params.get("RoadEdgesWidth")) + " inches";,
+  return std::clamp(v, 0, 24);
+)
+
 ParamController(SteeringWheel, "SteeringWheel", "Steering Wheel Icon", "Replace the stock openpilot steering wheel icon with a custom icon. Requires reboot for changes to take effect. Want to submit your own steering wheel? Message me on Discord: FrogsGoMoo #6969.", "../assets/offroad/icon_openpilot.png",
   return wheelLabels[QString::fromStdString(params.get("SteeringWheel")).toInt()];,
   return (v + 4) % 4;
