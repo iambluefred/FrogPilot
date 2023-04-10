@@ -15,6 +15,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"FrogTheme", "FrogPilot Theme", "Enable the beloved FrogPilot Theme! Disable toggle to revert back to the stock openpilot theme.", "../assets/images/frog_button_home.png"},
     {"100Brightness", "100% Screen Brightness", "Screen is always at 100% Brightness.", "../assets/offroad/icon_light.png"},
     {"6Hour", "6 Hour Shutdown", "Device turns off after being offroad for 6 hours instead of 30 to reduce energy waste and battery drain.", "../assets/offroad/icon_time.png"},
+    {"AdjustableFollowDistance", "Adjustable Follow Distance", "Enable the ability to adjust the follow distance via the 'Distance' button on the steering wheel. 1 bar = Aggressive, 2 bar = Normal, 3 = Relaxed (Toyota/Lexus Only)", "../assets/offroad/icon_distance.png"},
     {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"},
     {"Compass", "Compass", "Add a compass in bottom right corner of the onroad that rotates according to the direction you're driving.", "../assets/offroad/icon_compass.png"},
     {"CustomRoadUI", "Custom Road UI", "Create a unique openpilot road interface that reflects your individual style.", "../assets/offroad/icon_road.png"},

@@ -36,6 +36,9 @@ class CarInterface(CarInterfaceBase):
     ret.steerLimitTimer = 0.4
     ret.stoppingControl = False  # Toyota starts braking more when it thinks you want to stop
 
+    params = Params()
+    ret.adjustableFollow = params.get_bool("AdjustableFollowDistance")
+
     stop_and_go = False
 
     if candidate == CAR.PRIUS:

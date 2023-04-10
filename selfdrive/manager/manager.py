@@ -37,6 +37,7 @@ def manager_init() -> None:
   default_params: List[Tuple[str, Union[str, bytes]]] = [
     ("100Brightness", "1"),
     ("6Hour", "1"),
+    ("AdjustableFollowDistance", "1"),
     ("BackButton", "1"),
     ("Compass", "1"),
     ("CompletedTrainingVersion", "0"),
