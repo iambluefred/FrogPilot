@@ -16,6 +16,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"100Brightness", "100% Screen Brightness", "Screen is always at 100% Brightness.", "../assets/offroad/icon_light.png"},
     {"6Hour", "6 Hour Shutdown", "Device turns off after being offroad for 6 hours instead of 30 to reduce energy waste and battery drain.", "../assets/offroad/icon_time.png"},
     {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"},
+    {"Compass", "Compass", "Add a compass in bottom right corner of the onroad that rotates according to the direction you're driving.", "../assets/offroad/icon_compass.png"},
     {"CustomRoadUI", "Custom Road UI", "Create a unique openpilot road interface that reflects your individual style.", "../assets/offroad/icon_road.png"},
     {"DisableAd", "Disable comma prime Ad", "Disables the comma prime ad.", "../assets/offroad/icon_minus.png"},
     {"DisableInternetCheck", "Disable Internet Check", "Allows the device to be offline indefinitely.", "../assets/offroad/icon_warning.png"},

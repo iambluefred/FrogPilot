@@ -38,6 +38,7 @@ def manager_init() -> None:
     ("100Brightness", "1"),
     ("6Hour", "1"),
     ("BackButton", "1"),
+    ("Compass", "1"),
     ("CompletedTrainingVersion", "0"),
     ("CustomRoadUI", "1"),
     ("DisableInternetCheck", "1"),

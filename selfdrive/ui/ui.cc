@@ -223,6 +223,7 @@ static void update_state(UIState *s) {
 void ui_update_params(UIState *s) {
   auto params = Params();
   bool isFrogTheme = params.getBool("FrogTheme");
+  s->scene.compass = params.getBool("Compass");
   s->scene.frog_colors = isFrogTheme && params.getBool("FrogColors");
   s->scene.full_brightness = params.getBool("100Brightness");
   s->scene.is_metric = params.getBool("IsMetric");
@@ -270,7 +271,7 @@ UIState::UIState(QObject *parent) : QObject(parent) {
   sm = std::make_unique<SubMaster, const std::initializer_list<const char *>>({
     "modelV2", "controlsState", "liveCalibration", "radarState", "deviceState", "roadCameraState",
     "pandaStates", "carParams", "driverMonitoringState", "carState", "liveLocationKalman", "driverStateV2",
-    "wideRoadCameraState", "managerState", "navInstruction", "navRoute", "uiPlan",
+    "wideRoadCameraState", "managerState", "navInstruction", "navRoute", "uiPlan", "gpsLocationExternal",
   });
 
   Params params;

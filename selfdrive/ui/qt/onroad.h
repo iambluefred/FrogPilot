@@ -64,9 +64,12 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(bool rightHandDM MEMBER rightHandDM);
   Q_PROPERTY(int status MEMBER status);
 
+  Q_PROPERTY(bool compass MEMBER compass);
   Q_PROPERTY(bool frogColors MEMBER frogColors);
   Q_PROPERTY(bool muteDM MEMBER muteDM);
   Q_PROPERTY(bool rotatingWheel MEMBER rotatingWheel);
+  Q_PROPERTY(float bearingAccuracyDeg MEMBER bearingAccuracyDeg);
+  Q_PROPERTY(float bearingDeg MEMBER bearingDeg);
   Q_PROPERTY(int steering_angle_deg MEMBER steering_angle_deg);
 
 public:
@@ -74,11 +77,14 @@ public:
   void updateState(const UIState &s);
 
 private:
+  void drawCompass(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity, float bearing_deg = 0);
   void drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity);
   void drawIconRotate(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity, int angle_deg = 0);
   void drawText(QPainter &p, int x, int y, const QString &text, int alpha = 255);
 
   ExperimentalButton *experimental_btn;
+  QPixmap compass_inner_img;
+  QPixmap compass_outer_img;
   QPixmap dm_img;
   QPixmap engage_img;
   QPixmap experimental_img;
@@ -95,9 +101,12 @@ private:
   bool has_us_speed_limit = false;
   bool has_eu_speed_limit = false;
   bool v_ego_cluster_seen = false;
+  bool compass;
   bool frogColors;
   bool muteDM;
   bool rotatingWheel;
+  float bearingAccuracyDeg;
+  float bearingDeg = 0;
   int status = STATUS_DISENGAGED;
   int steering_angle_deg = 0;
   QString wheel;

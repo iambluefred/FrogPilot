@@ -240,6 +240,8 @@ AnnotatedCameraWidget::AnnotatedCameraWidget(VisionStreamType type, QWidget* par
   experimental_btn = new ExperimentalButton(this);
   main_layout->addWidget(experimental_btn, 0, Qt::AlignTop | Qt::AlignRight);
 
+  compass_inner_img = loadPixmap("../assets/images/compass_inner.png", {img_size, img_size});
+  compass_outer_img = loadPixmap("../assets/images/compass_outer.png", {img_size, img_size});
   dm_img = loadPixmap("../assets/img_driver_face.png", {img_size + 5, img_size + 5});
 }
 
@@ -299,6 +301,9 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
   // DM icon transition
   dm_fade_state = fmax(0.0, fmin(1.0, dm_fade_state+0.2*(0.5-(float)(dmActive))));
 
+  setProperty("bearingAccuracyDeg", sm["gpsLocationExternal"].getGpsLocationExternal().getBearingAccuracyDeg());
+  setProperty("bearingDeg", sm["gpsLocationExternal"].getGpsLocationExternal().getBearingDeg());
+  setProperty("compass", s.scene.compass);
   setProperty("frogColors", s.scene.frog_colors);
   setProperty("muteDM", s.scene.mute_dm);
   setProperty("rotatingWheel", s.scene.rotating_wheel);
@@ -469,6 +474,13 @@ void AnnotatedCameraWidget::drawHud(QPainter &p) {
                    wheel > 0 ? engage_img : sm["controlsState"].getControlsState().getExperimentalMode() ? experimental_img : engage_img,
                    (sm["controlsState"].getControlsState().getExperimentalMode() ? QColor(218, 111, 37, 241) : blackColor(166)), 1.0, steering_angle_deg);
   }
+
+  // compass
+  if (compass && bearingAccuracyDeg != 180.00) {
+    drawCompass(p, !rightHandDM ? rect().right() -  btn_size / 2 - (bdr_s * 2) : btn_size / 2 + (bdr_s * 2), rect().bottom() - footer_h / 2,
+                compass_outer_img, blackColor(100), 1.0, bearingDeg);
+  }
+
 }
 
 
@@ -797,4 +809,39 @@ void AnnotatedCameraWidget::showEvent(QShowEvent *event) {
 
   ui_update_params(uiState());
   prev_draw_t = millis_since_boot();
+}
+
+void AnnotatedCameraWidget::drawCompass(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity, float bearing_Deg) {
+  // Draw the circle background
+  p.setBrush(bg);
+  const int circle_size = btn_size + 10;
+  p.drawEllipse(x - circle_size / 2, y - circle_size / 2, circle_size, circle_size);
+
+  // Rotate and draw the compass_inner_img image
+  p.save();
+  p.translate(x, y);
+  p.rotate(bearing_Deg);
+  p.drawPixmap(-compass_inner_img.width() / 2, -compass_inner_img.height() / 2, compass_inner_img);
+  p.restore();
+
+  // Display compass_outer_img
+  QPixmap imgScaled = img.scaled(img.width() * 2, img.height() * 2, Qt::KeepAspectRatio);
+  p.drawPixmap(QPoint(x, y) - QPoint(imgScaled.width() / 2, imgScaled.height() / 2), imgScaled);
+
+  // Set the font for the direction labels
+  QFont font("Inter", 25, QFont::Bold);
+  p.setFont(font);
+  p.setPen(Qt::white);
+
+  // Draw the cardinal directions
+  const auto drawDirection = [&](const QString &text, float from, float to, int align) {
+    // Set the opacity based on whether the direction label is currently being pointed at
+    p.setOpacity((bearing_Deg >= from && bearing_Deg < to) ? 1.0 : 0.2);
+    p.drawText(QRect(x - btn_size / 2, y - btn_size / 2, btn_size, btn_size), align, text);
+  };
+  drawDirection("N", 0, 67.5, Qt::AlignTop | Qt::AlignHCenter);
+  drawDirection("E", 22.5, 157.5, Qt::AlignRight | Qt::AlignVCenter);
+  drawDirection("S", 112.5, 247.5, Qt::AlignBottom | Qt::AlignHCenter);
+  drawDirection("W", 202.5, 337.5, Qt::AlignLeft | Qt::AlignVCenter);
+  drawDirection("N", 292.5, 360, Qt::AlignTop | Qt::AlignHCenter);
 }
