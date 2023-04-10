@@ -44,6 +44,7 @@ Sidebar::Sidebar(QWidget *parent) : QFrame(parent), onroad(false), flag_pressed(
   isFrogTheme = params.getBool("FrogTheme");
   isFrogColors = isFrogTheme && params.getBool("FrogColors");
   isFrogIcons = isFrogTheme && params.getBool("FrogIcons");
+  isNumericalTemp = params.getBool("NumericalTemp");
 
   connect(this, &Sidebar::valueChanged, [=] { update(); });
 
@@ -93,6 +94,7 @@ void Sidebar::updateState(const UIState &s) {
   auto deviceState = sm["deviceState"].getDeviceState();
   setProperty("netType", network_type[deviceState.getNetworkType()]);
   int strength = (int)deviceState.getNetworkStrength();
+  setProperty("ambientTemp", QString("%1°C").arg((int)deviceState.getAmbientTempC()));
   setProperty("netStrength", strength > 0 ? strength + 1 : 0);
 
   ItemStatus connectStatus;
@@ -104,12 +106,12 @@ void Sidebar::updateState(const UIState &s) {
   }
   setProperty("connectStatus", QVariant::fromValue(connectStatus));
 
-  ItemStatus tempStatus = {{tr("TEMP"), tr("HIGH")}, danger_color};
+  ItemStatus tempStatus = {{tr("TEMP"), isNumericalTemp ? ambient_temp : tr("HIGH")}, danger_color};
   auto ts = deviceState.getThermalStatus();
   if (ts == cereal::DeviceState::ThermalStatus::GREEN) {
-    tempStatus = {{tr("TEMP"), tr("GOOD")}, isFrogColors ? frog_color : good_color};
+    tempStatus = {{tr("TEMP"), isNumericalTemp ? ambient_temp : tr("GOOD")}, isFrogColors ? frog_color : good_color};
   } else if (ts == cereal::DeviceState::ThermalStatus::YELLOW) {
-    tempStatus = {{tr("TEMP"), tr("OK")}, warning_color};
+    tempStatus = {{tr("TEMP"), isNumericalTemp ? ambient_temp : tr("OK")}, warning_color};
   }
   setProperty("tempStatus", QVariant::fromValue(tempStatus));
 

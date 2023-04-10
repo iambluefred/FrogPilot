@@ -54,6 +54,7 @@ def manager_init() -> None:
     ("MuteDM", "1"),
     ("MuteDoor", "1"),
     ("MuteSeatbelt", "1"),
+    ("NumericalTemp", "1"),
     ("OpenpilotEnabledToggle", "1"),
     ("Sidebar", "1"),
     ("WideCameraDisable", "1"),
