@@ -18,7 +18,8 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"},
     {"DisableAd", "Disable comma prime Ad", "Disables the comma prime ad.", "../assets/offroad/icon_minus.png"},
     {"DisableInternetCheck", "Disable Internet Check", "Allows the device to be offline indefinitely.", "../assets/offroad/icon_warning.png"},
-    {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"}
+    {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"},
+    {"WideCameraDisable", "Wide Camera Overridden", "Turns off the wide camera from displaying while onroad. This toggle is purely cosmetic and won't prevent openpilot from using the wide camera.", "../assets/offroad/icon_camera.png"}
   };
 
   for (int i = 0; i < toggles.size(); i++) {

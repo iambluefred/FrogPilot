@@ -214,6 +214,7 @@ void ui_update_params(UIState *s) {
   s->scene.full_brightness = params.getBool("100Brightness");
   s->scene.is_metric = params.getBool("IsMetric");
   s->scene.map_on_left = params.getBool("NavSettingLeftSide");
+  s->scene.wide_camera_disable = params.getBool("WideCameraDisable");
 }
 
 void UIState::updateStatus() {

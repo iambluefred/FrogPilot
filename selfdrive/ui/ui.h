@@ -127,6 +127,8 @@ typedef struct UIScene {
   bool frog_colors;
   bool full_brightness;
   bool isFrogTheme;
+  bool wide_camera_disable;
+
 } UIScene;
 
 class UIState : public QObject {
