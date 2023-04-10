@@ -238,6 +238,11 @@ bool ConfirmationDialog::rich(const QString &prompt_text, QWidget *parent) {
   return d.exec();
 }
 
+bool ConfirmationDialog::toggle(const QString &prompt_text, const QString &confirm_text, QWidget *parent) {
+  ConfirmationDialog d = ConfirmationDialog(prompt_text, confirm_text, tr("Reboot Later"), false, parent);
+  return d.exec();
+}
+
 // MultiOptionDialog
 
 MultiOptionDialog::MultiOptionDialog(const QString &prompt_text, const QStringList &l, const QString &current, QWidget *parent) : QDialogBase(parent) {

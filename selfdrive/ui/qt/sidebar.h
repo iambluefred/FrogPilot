@@ -33,7 +33,7 @@ protected:
   void mouseReleaseEvent(QMouseEvent *event) override;
   void drawMetric(QPainter &p, const QPair<QString, QString> &label, QColor c, int y);
 
-  QPixmap home_img, flag_img, settings_img;
+  QPixmap home_img, flag_img, settings_img, frog_home_img, frog_settings_img;
   bool onroad, flag_pressed, settings_pressed;
   const QMap<cereal::DeviceState::NetworkType, QString> network_type = {
     {cereal::DeviceState::NetworkType::NONE, tr("--")},
@@ -50,6 +50,7 @@ protected:
   const QColor good_color = QColor(255, 255, 255);
   const QColor warning_color = QColor(218, 202, 37);
   const QColor danger_color = QColor(201, 34, 49);
+  const QColor frog_color = QColor(0x17, 0x86, 0x44, 0xf1);
 
   ItemStatus connect_status, panda_status, temp_status;
   QString net_type;
@@ -57,4 +58,7 @@ protected:
 
 private:
   std::unique_ptr<PubMaster> pm;
+  bool isFrogColors;
+  bool isFrogIcons;
+  bool isFrogTheme;
 };

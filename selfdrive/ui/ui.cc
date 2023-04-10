@@ -209,6 +209,8 @@ static void update_state(UIState *s) {
 
 void ui_update_params(UIState *s) {
   auto params = Params();
+  bool isFrogTheme = params.getBool("FrogTheme");
+  s->scene.frog_colors = isFrogTheme && params.getBool("FrogColors");
   s->scene.is_metric = params.getBool("IsMetric");
   s->scene.map_on_left = params.getBool("NavSettingLeftSide");
 }

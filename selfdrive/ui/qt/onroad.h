@@ -61,6 +61,8 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(bool rightHandDM MEMBER rightHandDM);
   Q_PROPERTY(int status MEMBER status);
 
+  Q_PROPERTY(bool frogColors MEMBER frogColors);
+
 public:
   explicit AnnotatedCameraWidget(VisionStreamType type, QWidget* parent = 0);
   void updateState(const UIState &s);
@@ -84,11 +86,14 @@ private:
   bool has_us_speed_limit = false;
   bool has_eu_speed_limit = false;
   bool v_ego_cluster_seen = false;
+  bool frogColors;
   int status = STATUS_DISENGAGED;
   std::unique_ptr<PubMaster> pm;
 
   int skip_frame_count = 0;
   bool wide_cam_requested = false;
+
+  Params params;
 
 protected:
   void paintGL() override;
@@ -102,6 +107,7 @@ protected:
   inline QColor redColor(int alpha = 255) { return QColor(201, 34, 49, alpha); }
   inline QColor whiteColor(int alpha = 255) { return QColor(255, 255, 255, alpha); }
   inline QColor blackColor(int alpha = 255) { return QColor(0, 0, 0, alpha); }
+  inline QColor frogColor(int alpha = 242) { return QColor(23, 134, 68, alpha); }
 
   double prev_draw_t = 0;
   FirstOrderFilter fps_filter;

@@ -7,6 +7,7 @@
 #include <QDebug>
 
 #include "cereal/messaging/messaging.h"
+#include "common/params.h"
 #include "common/util.h"
 
 // TODO: detect when we can't play sounds
@@ -15,12 +16,14 @@
 Sound::Sound(QObject *parent) : sm({"controlsState", "deviceState", "microphone"}) {
   qInfo() << "default audio device: " << QAudioDeviceInfo::defaultOutputDevice().deviceName();
 
+  auto params = Params();
+
   for (auto &[alert, fn, loops] : sound_list) {
     QSoundEffect *s = new QSoundEffect(this);
     QObject::connect(s, &QSoundEffect::statusChanged, [=]() {
       assert(s->status() != QSoundEffect::Error);
     });
-    s->setSource(QUrl::fromLocalFile("../../assets/sounds/" + fn));
+    s->setSource(params.getBool("FrogTheme") && params.getBool("FrogSounds") ? QUrl::fromLocalFile("../../assets/frogsounds/" + fn) : QUrl::fromLocalFile("../../assets/sounds/" + fn));
     sounds[alert] = {s, loops};
   }
 

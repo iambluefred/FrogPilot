@@ -289,6 +289,8 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
 
   // DM icon transition
   dm_fade_state = fmax(0.0, fmin(1.0, dm_fade_state+0.2*(0.5-(float)(dmActive))));
+
+  setProperty("frogColors", s.scene.frog_colors);
 }
 
 void AnnotatedCameraWidget::drawHud(QPainter &p) {
@@ -500,20 +502,24 @@ void AnnotatedCameraWidget::drawLaneLines(QPainter &painter, const UIState *s) {
 
   // lanelines
   for (int i = 0; i < std::size(scene.lane_line_vertices); ++i) {
-    painter.setBrush(QColor::fromRgbF(1.0, 1.0, 1.0, std::clamp<float>(scene.lane_line_probs[i], 0.0, 0.7)));
+    painter.setBrush(frogColors ? QColor(0x17, 0x86, 0x44, 0xf1) : QColor::fromRgbF(1.0, 1.0, 1.0, std::clamp<float>(scene.lane_line_probs[i], 0.0, 0.7)));
     painter.drawPolygon(scene.lane_line_vertices[i]);
   }
 
   // road edges
   for (int i = 0; i < std::size(scene.road_edge_vertices); ++i) {
-    painter.setBrush(QColor::fromRgbF(1.0, 0, 0, std::clamp<float>(1.0 - scene.road_edge_stds[i], 0.0, 1.0)));
+    painter.setBrush(frogColors ? QColor(0x17, 0x86, 0x44, 0xf1) : QColor::fromRgbF(1.0, 0, 0, std::clamp<float>(1.0 - scene.road_edge_stds[i], 0.0, 1.0)));
     painter.drawPolygon(scene.road_edge_vertices[i]);
   }
 
   // paint path
   QLinearGradient bg(0, height(), 0, height() / 4);
   float start_hue, end_hue;
-  if (sm["controlsState"].getControlsState().getExperimentalMode()) {
+  if (frogColors) {
+    bg.setColorAt(0.0, QColor::fromHslF(144 / 360., 0.71, 0.31, 1.0));
+    bg.setColorAt(0.5, QColor::fromHslF(144 / 360., 0.71, 0.31, 0.5));
+    bg.setColorAt(1.0, QColor::fromHslF(144 / 360., 0.71, 0.31, 0.0));
+  } else if (sm["controlsState"].getControlsState().getExperimentalMode()) {
     const auto &acceleration = sm["modelV2"].getModelV2().getAcceleration();
     float acceleration_future = 0;
     if (acceleration.getZ().size() > 16) {
@@ -590,8 +596,8 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s)
 void AnnotatedCameraWidget::drawLead(QPainter &painter, const cereal::RadarState::LeadData::Reader &lead_data, const QPointF &vd) {
   painter.save();
 
-  const float speedBuff = 10.;
-  const float leadBuff = 40.;
+  const float speedBuff = frogColors ? 25. : 10.;
+  const float leadBuff = frogColors ? 100. : 40.;
   const float d_rel = lead_data.getDRel();
   const float v_rel = lead_data.getVRel();
 
@@ -617,7 +623,7 @@ void AnnotatedCameraWidget::drawLead(QPainter &painter, const cereal::RadarState
 
   // chevron
   QPointF chevron[] = {{x + (sz * 1.25), y + sz}, {x, y}, {x - (sz * 1.25), y + sz}};
-  painter.setBrush(redColor(fillAlpha));
+  painter.setBrush(frogColors ? frogColor(fillAlpha) : redColor(fillAlpha));
   painter.drawPolygon(chevron, std::size(chevron));
 
   painter.restore();
