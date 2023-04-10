@@ -64,9 +64,14 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(bool rightHandDM MEMBER rightHandDM);
   Q_PROPERTY(int status MEMBER status);
 
+  Q_PROPERTY(bool blindspot_left MEMBER blindspot_left);
+  Q_PROPERTY(bool blindspot_right MEMBER blindspot_right);
   Q_PROPERTY(bool compass MEMBER compass);
   Q_PROPERTY(bool frogColors MEMBER frogColors);
+  Q_PROPERTY(bool frogSignals MEMBER frogSignals);
+  Q_PROPERTY(bool left_on MEMBER left_on);
   Q_PROPERTY(bool muteDM MEMBER muteDM);
+  Q_PROPERTY(bool right_on MEMBER right_on);
   Q_PROPERTY(bool rotatingWheel MEMBER rotatingWheel);
   Q_PROPERTY(float bearingAccuracyDeg MEMBER bearingAccuracyDeg);
   Q_PROPERTY(float bearingDeg MEMBER bearingDeg);
@@ -78,6 +83,7 @@ public:
 
 private:
   void drawCompass(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity, float bearing_deg = 0);
+  void drawFrogSignals(QPainter &p);
   void drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity);
   void drawIconRotate(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity, int angle_deg = 0);
   void drawText(QPainter &p, int x, int y, const QString &text, int alpha = 255);
@@ -101,9 +107,14 @@ private:
   bool has_us_speed_limit = false;
   bool has_eu_speed_limit = false;
   bool v_ego_cluster_seen = false;
+  bool blindspot_left;
+  bool blindspot_right;
   bool compass;
   bool frogColors;
+  bool frogSignals;
+  bool left_on;
   bool muteDM;
+  bool right_on;
   bool rotatingWheel;
   float bearingAccuracyDeg;
   float bearingDeg = 0;
@@ -111,6 +122,7 @@ private:
   int steering_angle_deg = 0;
   QString wheel;
   std::unique_ptr<PubMaster> pm;
+  std::vector<QPixmap> signal_img_vector;
 
   int skip_frame_count = 0;
   bool wide_cam_requested = false;

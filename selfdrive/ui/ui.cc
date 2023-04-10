@@ -225,6 +225,7 @@ void ui_update_params(UIState *s) {
   bool isFrogTheme = params.getBool("FrogTheme");
   s->scene.compass = params.getBool("Compass");
   s->scene.frog_colors = isFrogTheme && params.getBool("FrogColors");
+  s->scene.frog_signals = isFrogTheme && params.getBool("FrogSignals");
   s->scene.full_brightness = params.getBool("100Brightness");
   s->scene.is_metric = params.getBool("IsMetric");
   s->scene.map_on_left = params.getBool("NavSettingLeftSide");

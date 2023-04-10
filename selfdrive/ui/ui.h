@@ -127,6 +127,7 @@ typedef struct UIScene {
 
   bool compass;
   bool frog_colors;
+  bool frog_signals;
   bool full_brightness;
   bool isFrogTheme;
   bool mute_dm;

@@ -47,6 +47,7 @@ def manager_init() -> None:
     ("FireTheBabysitter", "1"),
     ("FrogColors", "1"),
     ("FrogIcons", "1"),
+    ("FrogSignals", "1"),
     ("FrogSounds", "1"),
     ("FrogTheme", "1"),
     ("GsmMetered", "1"),

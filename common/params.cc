@@ -123,6 +123,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"ForcePowerDown", CLEAR_ON_MANAGER_START},
     {"FrogColors", PERSISTENT},
     {"FrogIcons", PERSISTENT},
+    {"FrogSignals", PERSISTENT},
     {"FrogSounds", PERSISTENT},
     {"FrogTheme", PERSISTENT},
     {"GitBranch", PERSISTENT},
