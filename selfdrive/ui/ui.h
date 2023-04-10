@@ -126,6 +126,7 @@ typedef struct UIScene {
   uint64_t started_frame;
 
   bool compass;
+  bool conditional_experimental;
   bool frog_colors;
   bool frog_signals;
   bool full_brightness;
@@ -133,6 +134,9 @@ typedef struct UIScene {
   bool mute_dm;
   bool rotating_wheel;
   bool wide_camera_disable;
+  int conditional_overridden;
+  int conditional_speed;
+  int conditional_status;
   int steering_angle = 0;
 
 } UIScene;

@@ -32,6 +32,7 @@ private:
 class ExperimentalButton : public QPushButton {
   Q_OBJECT
   Q_PROPERTY(bool rotatingWheel MEMBER rotatingWheel);
+  Q_PROPERTY(int conditionalOverridden MEMBER conditionalOverridden);
 
 public:
   explicit ExperimentalButton(QWidget *parent = 0);
@@ -42,6 +43,7 @@ private:
 
   Params params;
   bool rotatingWheel;
+  int conditionalOverridden;
   QPixmap engage_img;
   QPixmap experimental_img;
   QString wheel;
@@ -67,6 +69,7 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(bool blindspot_left MEMBER blindspot_left);
   Q_PROPERTY(bool blindspot_right MEMBER blindspot_right);
   Q_PROPERTY(bool compass MEMBER compass);
+  Q_PROPERTY(bool conditionalExperimental MEMBER conditionalExperimental);
   Q_PROPERTY(bool frogColors MEMBER frogColors);
   Q_PROPERTY(bool frogSignals MEMBER frogSignals);
   Q_PROPERTY(bool left_on MEMBER left_on);
@@ -75,6 +78,9 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(bool rotatingWheel MEMBER rotatingWheel);
   Q_PROPERTY(float bearingAccuracyDeg MEMBER bearingAccuracyDeg);
   Q_PROPERTY(float bearingDeg MEMBER bearingDeg);
+  Q_PROPERTY(int conditionalOverridden MEMBER conditionalOverridden);
+  Q_PROPERTY(int conditionalSpeed MEMBER conditionalSpeed);
+  Q_PROPERTY(int conditionalStatus MEMBER conditionalStatus);
   Q_PROPERTY(int steering_angle_deg MEMBER steering_angle_deg);
 
 public:
@@ -83,6 +89,7 @@ public:
 
 private:
   void drawCompass(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity, float bearing_deg = 0);
+  void drawConditionalExperimentalStatus(QPainter &p);
   void drawFrogSignals(QPainter &p);
   void drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity);
   void drawIconRotate(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity, int angle_deg = 0);
@@ -110,6 +117,7 @@ private:
   bool blindspot_left;
   bool blindspot_right;
   bool compass;
+  bool conditionalExperimental;
   bool frogColors;
   bool frogSignals;
   bool left_on;
@@ -118,6 +126,9 @@ private:
   bool rotatingWheel;
   float bearingAccuracyDeg;
   float bearingDeg = 0;
+  int conditionalOverridden;
+  int conditionalSpeed;
+  int conditionalStatus;
   int status = STATUS_DISENGAGED;
   int steering_angle_deg = 0;
   QString wheel;

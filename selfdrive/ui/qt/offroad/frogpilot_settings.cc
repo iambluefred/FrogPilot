@@ -18,6 +18,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"AdjustableFollowDistance", "Adjustable Follow Distance", "Enable the ability to adjust the follow distance via the 'Distance' button on the steering wheel. 1 bar = Aggressive, 2 bar = Normal, 3 = Relaxed (Toyota/Lexus Only)", "../assets/offroad/icon_distance.png"},
     {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"},
     {"Compass", "Compass", "Add a compass in bottom right corner of the onroad that rotates according to the direction you're driving.", "../assets/offroad/icon_compass.png"},
+    {"ConditionalExperimentalMode", "Conditional Experimental Mode", "Have openpilot automatically switch between 'Experimental Mode' and 'Chill Mode' depending on specified conditions.", "../assets/offroad/icon_conditional.png"},
     {"CustomRoadUI", "Custom Road UI", "Create a unique openpilot road interface that reflects your individual style.", "../assets/offroad/icon_road.png"},
     {"DisableAd", "Disable comma prime Ad", "Disables the comma prime ad.", "../assets/offroad/icon_minus.png"},
     {"DisableInternetCheck", "Disable Internet Check", "Allows the device to be offline indefinitely.", "../assets/offroad/icon_warning.png"},
@@ -49,6 +50,14 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
         new RoadEdgesWidth()
       }, {
         {"UnlimitedLength", "'Unlimited' Length", "Increases the path and road lines to extend out as far as the model can see."}
+      });
+    } else if (key == "ConditionalExperimentalMode") {
+      createSubControl(key, label, desc, icon, {
+        new ConditionalExperimentalModeSpeed(),
+      }, {
+        {"ConditionalExperimentalModeCurves", "Switch to Experimental Mode On Curves", "Switch to 'Experimental Mode' when on curves."},
+        {"ConditionalExperimentalModeCurvesLead", "   Don't Switch On Curves With Lead", "Don't switch to 'Experimental Mode' when on curves with a lead vehicle."},
+        {"ConditionalExperimentalModeSignal", "Switch to Experimental Mode On Turn Signal", "Switch to 'Experimental Mode' whenever the turn signal is on for left and right turns."}
       });
     } else if (key == "FireTheBabysitter") {
       createSubControl(key, label, desc, icon, {}, {

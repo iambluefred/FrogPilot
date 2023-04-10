@@ -224,6 +224,10 @@ void ui_update_params(UIState *s) {
   auto params = Params();
   bool isFrogTheme = params.getBool("FrogTheme");
   s->scene.compass = params.getBool("Compass");
+  s->scene.conditional_experimental = params.getBool("ConditionalExperimentalMode");
+  s->scene.conditional_overridden = QString::fromStdString(params.get("ConditionalOverridden")).toInt();
+  s->scene.conditional_speed = QString::fromStdString(params.get("ConditionalExperimentalModeSpeed")).toInt();
+  s->scene.conditional_status = QString::fromStdString(params.get("ConditionalStatus")).toInt();
   s->scene.frog_colors = isFrogTheme && params.getBool("FrogColors");
   s->scene.frog_signals = isFrogTheme && params.getBool("FrogSignals");
   s->scene.full_brightness = params.getBool("100Brightness");

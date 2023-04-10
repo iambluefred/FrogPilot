@@ -75,6 +75,11 @@ private: \
   int newValue(int v) { newValueFunc } \
 };
 
+ParamController(ConditionalExperimentalModeSpeed, "ConditionalExperimentalModeSpeed", "   Switch to Experimental Mode Below", "Switch to 'Experimental Mode' below this speed when there is no lead car in order to take advantage of red lights and stop signs.", "../assets/offroad/icon_blank.png",
+  return QString::fromStdString(params.get("ConditionalExperimentalModeSpeed")) + "mph";,
+  return std::clamp(v, 0, 99);
+)
+
 ParamController(LaneLinesWidth, "LaneLinesWidth", "   Lane Line Width", "Customize the lane lines width. Default matches the MUTCD average of 4 inches.", "../assets/offroad/icon_blank.png",
   return QString::fromStdString(params.get("LaneLinesWidth")) + " inches";,
   return std::clamp(v, 0, 24);

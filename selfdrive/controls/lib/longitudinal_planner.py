@@ -9,6 +9,7 @@ from common.filter_simple import FirstOrderFilter
 from common.params import Params
 from common.realtime import DT_MDL
 from selfdrive.modeld.constants import T_IDXS
+from selfdrive.controls.lib.lateral_planner import TRAJECTORY_SIZE
 from selfdrive.controls.lib.longcontrol import LongCtrlState
 from selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import LongitudinalMpc, MIN_ACCEL, MAX_ACCEL
 from selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import T_IDXS as T_IDXS_MPC
@@ -63,6 +64,18 @@ class LongitudinalPlanner:
     self.solverExecutionTime = 0.0
 
     self.personal_tune = self.CP.personalTune
+
+    # Set variables for Conditional Experimental Mode
+    self.params = Params()
+    self.conditional_experimental = self.params.get_bool("ConditionalExperimentalMode")
+    self.curves = self.conditional_experimental and self.params.get_bool("ConditionalExperimentalModeCurves")
+    self.curves_lead = self.conditional_experimental and self.params.get_bool("ConditionalExperimentalModeCurvesLead")
+    self.limit = float(self.params.get("ConditionalExperimentalModeSpeed")) * CV.MPH_TO_MS
+    self.signal = self.conditional_experimental and self.params.get_bool("ConditionalExperimentalModeSignal")
+    self.curve = False
+    self.limit_checked = True
+    self.override_reset = False
+    self.previous_status_value = 0
 
   @staticmethod
   def parse_model(model_msg, model_error):
@@ -144,6 +157,78 @@ class LongitudinalPlanner:
     a_prev = self.a_desired
     self.a_desired = float(interp(DT_MDL, T_IDXS[:CONTROL_N], self.a_desired_trajectory))
     self.v_desired_filter.x = self.v_desired_filter.x + DT_MDL * (self.a_desired + a_prev) / 2.0
+
+    # Set the lead vehicle's status
+    lead = sm['radarState'].leadOne.status
+
+    # Determine the road curvature
+    def road_curvature():
+      # Retrieve the model data
+      model_data = sm['modelV2'] if sm.valid.get('modelV2', False) else None
+      # Check if curves are enabled, if there's no lead vehicle if necessary, model_data is available, and if the number of lane lines and their size are as expected
+      if self.curves and not (self.curves_lead and lead) and model_data and len(model_data.laneLines) == 4 and len(model_data.laneLines[0].t) == TRAJECTORY_SIZE:
+        # Extract left and right lane probabilities
+        left_prob, right_prob = model_data.laneLineProbs[1], model_data.laneLineProbs[2]
+        # Check if both left and right lane probabilities are above the threshold (0.6)
+        if left_prob > 0.6 and right_prob > 0.6:
+          # Get the x-coordinates of the left lane line
+          lane_x = model_data.laneLines[1].x
+          # Compute the center y-coordinates of the lane by averaging left and right lane y-coordinates
+          center_y = ((np.array(model_data.laneLines[2].y) - np.array(model_data.laneLines[1].y)) / 2 + np.array(model_data.laneLines[1].y))
+          # Fit a 3rd degree polynomial to the lane's x and center_y points
+          path_polynomial = np.polyfit(lane_x, center_y, 3)
+          # Generate an array of x_values for the curvature calculation
+          x_values = np.linspace(20, 150, num=30)
+          # Calculate the curvature for each x_value, and return the maximum curvature multiplied by the square of ego vehicle's speed
+          return (v_ego**2 * np.amax(np.vectorize(lambda x: abs(2 * path_polynomial[1] + 6 * path_polynomial[0] * x) / (1 + (3 * path_polynomial[0] * x**2 + 2 * path_polynomial[1] * x + path_polynomial[2])**2)**(1.5))(x_values)))
+      # Return 0 if the conditions for curvature calculation are not met.
+      return 0
+
+    # Conditional Experimental Mode
+    def conditional_experimental_mode():
+      # Retrieve the road curvature data
+      curvature = road_curvature()
+
+      # Set the current status of ExperimentalMode
+      experimental_mode = self.mpc.mode == 'blended'
+
+      # Only check and update the limit once
+      if not self.limit_checked:
+        self.limit = float(self.params.get("ConditionalExperimentalModeSpeed")) * CV.MPH_TO_MS
+        self.limit_checked = True
+
+      # Update conditions
+      self.curve = curvature >= 1.6 or (self.curve and curvature > 1.2)
+      signal = self.signal and v_ego < self.limit and (sm['carState'].leftBlinker or sm['carState'].rightBlinker)
+      speed = not lead and v_ego < self.limit
+      conditions_met = self.curve or speed or signal
+
+      # Update Experimental Mode and reset the ConditionalOverridden parameter
+      if not experimental_mode and conditions_met:
+        if int(self.params.get("ConditionalOverridden") or 0) != 1:
+          self.params.put_bool('ExperimentalMode', True)
+          self.override_reset = False
+      elif experimental_mode and not conditions_met and not sm['carState'].standstill:
+        if int(self.params.get("ConditionalOverridden") or 0) != 2:
+          self.params.put_bool('ExperimentalMode', False)
+          # Check the speed limit just in case the user changed it's value mid drive
+          self.limit_checked = False
+          self.override_reset = False
+
+      # Reset the ConditionalOverridden parameter
+      if not self.override_reset and not conditions_met:
+        self.params.put("ConditionalOverridden", "0")
+        self.override_reset = True
+
+      # Set parameter for on-road status bar
+      status_value = 1 if self.curve else 2 if signal else 3 if speed else 0
+      # Update status value if it has changed
+      if status_value != self.previous_status_value:
+        self.params.put("ConditionalStatus", str(status_value))
+        self.previous_status_value = status_value
+
+    if self.conditional_experimental:
+      conditional_experimental_mode()
 
   def publish(self, sm, pm):
     plan_send = messaging.new_message('longitudinalPlan')
