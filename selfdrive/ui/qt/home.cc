@@ -1,5 +1,6 @@
 #include "selfdrive/ui/qt/home.h"
 
+#include <QDateTime>
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QVBoxLayout>
@@ -121,6 +122,9 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
   QObject::connect(alert_notif, &QPushButton::clicked, [=] { center_layout->setCurrentIndex(2); });
   header_layout->addWidget(alert_notif, 0, Qt::AlignHCenter | Qt::AlignLeft);
 
+  date = new ElidedLabel();
+  header_layout->addWidget(date, 0, Qt::AlignHCenter | Qt::AlignLeft);
+
   version = new ElidedLabel();
   header_layout->addWidget(version, 0, Qt::AlignHCenter | Qt::AlignRight);
 
@@ -195,7 +199,8 @@ void OffroadHome::hideEvent(QHideEvent *event) {
 }
 
 void OffroadHome::refresh() {
-  version->setText(getBrand() + " " +  QString::fromStdString(params.get("UpdaterCurrentDescription")));
+  date->setText(QLocale(QString(uiState()->language).replace("main_", "")).toString(QDateTime::currentDateTime(), "dddd, MMMM d"));
+  version->setText(getBrand() + " v" + getVersion().left(14).trimmed());
 
   bool updateAvailable = update_widget->refresh();
   int alerts = alerts_widget->refresh();
