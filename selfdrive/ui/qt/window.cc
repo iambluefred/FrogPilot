@@ -2,9 +2,10 @@
 
 #include <QFontDatabase>
 
+#include "common/params.h"
 #include "system/hardware/hw.h"
 
-MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent), sidebar_enabled(Params().getBool("Sidebar")) {
   main_layout = new QStackedLayout(this);
   main_layout->setMargin(0);
 
@@ -74,7 +75,7 @@ void MainWindow::closeSettings() {
   main_layout->setCurrentWidget(homeWindow);
 
   if (uiState()->scene.started) {
-    homeWindow->showSidebar(false);
+    homeWindow->showSidebar(sidebar_enabled);
   }
 }
 

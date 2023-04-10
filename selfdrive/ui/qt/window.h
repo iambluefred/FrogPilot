@@ -24,4 +24,6 @@ private:
   HomeWindow *homeWindow;
   SettingsWindow *settingsWindow;
   OnboardingWindow *onboardingWindow;
+
+  bool sidebar_enabled;
 };
