@@ -13,6 +13,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
 
   const std::vector<std::tuple<QString, QString, QString, QString>> toggles = {
     {"FrogTheme", "FrogPilot Theme", "Enable the beloved FrogPilot Theme! Disable toggle to revert back to the stock openpilot theme.", "../assets/images/frog_button_home.png"},
+    {"100Brightness", "100% Screen Brightness", "Screen is always at 100% Brightness.", "../assets/offroad/icon_light.png"},
     {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"}
   };
 

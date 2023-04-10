@@ -211,6 +211,7 @@ void ui_update_params(UIState *s) {
   auto params = Params();
   bool isFrogTheme = params.getBool("FrogTheme");
   s->scene.frog_colors = isFrogTheme && params.getBool("FrogColors");
+  s->scene.full_brightness = params.getBool("100Brightness");
   s->scene.is_metric = params.getBool("IsMetric");
   s->scene.map_on_left = params.getBool("NavSettingLeftSide");
 }
@@ -324,6 +325,8 @@ void Device::updateBrightness(const UIState &s) {
   int brightness = brightness_filter.update(clipped_brightness);
   if (!awake) {
     brightness = 0;
+  } else if (s.scene.full_brightness) {
+    brightness = 100;
   }
 
   if (brightness != last_brightness) {
