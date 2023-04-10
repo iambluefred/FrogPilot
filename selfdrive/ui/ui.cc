@@ -260,6 +260,8 @@ void UIState::updateStatus() {
     emit offroadTransition(!scene.started);
   }
 
+  ui_update_params(uiState());
+
   // Handle prime type change
   if (prime_type != prime_type_prev) {
     prime_type_prev = prime_type;

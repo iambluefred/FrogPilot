@@ -21,6 +21,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"CustomRoadUI", "Custom Road UI", "Create a unique openpilot road interface that reflects your individual style.", "../assets/offroad/icon_road.png"},
     {"DisableAd", "Disable comma prime Ad", "Disables the comma prime ad.", "../assets/offroad/icon_minus.png"},
     {"DisableInternetCheck", "Disable Internet Check", "Allows the device to be offline indefinitely.", "../assets/offroad/icon_warning.png"},
+    {"ExperimentalModeSteeringWheel", "Enable Experimental Mode Via Steering Wheel", "Enable Experimental Mode by 'double clicking' the 'Lane Departure'/LKAS button on the steering wheel. This will override 'Conditional Experimental Mode' (Toyota/Lexus Only)", "../assets/img_experimental_white.svg"},
     {"FireTheBabysitter", "Fire the Babysitter", "Disable some of openpilot's 'Babysitter Protocols'.", "../assets/offroad/icon_babysitter.png"},
     {"NudgelessLaneChange", "Nudgeless Lane Change", "Change lanes without the need to nudge the steering wheel first.", "../assets/offroad/icon_lane.png"},
     {"NumericalTemp", "Numerical Temperature Gauge", "Replace openpilot's 'GOOD', 'OK', and 'HIGH' temperature statuses with numerical readings.", "../assets/offroad/icon_temp.png"},

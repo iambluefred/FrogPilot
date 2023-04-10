@@ -112,6 +112,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"ExperimentalMode", PERSISTENT},
     {"ExperimentalModeConfirmed", PERSISTENT},
     {"ExperimentalLongitudinalEnabled", PERSISTENT},
+    {"ExperimentalModeSteeringWheel", PERSISTENT},
     {"ExperimentalPersonalTune", PERSISTENT},
     {"DisableAd", PERSISTENT},
     {"DisableUpdates", PERSISTENT},
