@@ -11,6 +11,7 @@
 
 #include <QrCode.hpp>
 
+#include "common/params.h"
 #include "selfdrive/ui/qt/request_repeater.h"
 #include "selfdrive/ui/qt/util.h"
 #include "selfdrive/ui/qt/qt_window.h"
@@ -277,6 +278,8 @@ SetupWidget::SetupWidget(QWidget* parent) : QFrame(parent) {
   primeUser = new PrimeUserWidget;
   mainLayout->addWidget(primeUser);
 
+  disableAd = Params().getBool("DisableAd");
+
   mainLayout->setCurrentWidget(uiState()->prime_type ? (QWidget*)primeUser : (QWidget*)primeAd);
 
   setFixedWidth(750);
@@ -319,7 +322,7 @@ void SetupWidget::replyFinished(const QString &response, bool success) {
   } else {
     popup->reject();
 
-    if (prime_type) {
+    if (prime_type or disableAd) {
       mainLayout->setCurrentWidget(primeUser);
     } else {
       mainLayout->setCurrentWidget(primeAd);

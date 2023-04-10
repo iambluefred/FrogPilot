@@ -68,6 +68,8 @@ public:
 class SetupWidget : public QFrame {
   Q_OBJECT
 
+  bool disableAd;
+
 public:
   explicit SetupWidget(QWidget* parent = 0);
 
