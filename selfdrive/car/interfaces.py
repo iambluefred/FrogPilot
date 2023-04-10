@@ -117,6 +117,10 @@ class CarInterfaceBase(ABC):
       # mass and CG position, so all cars will have approximately similar dyn behaviors
       ret.tireStiffnessFront, ret.tireStiffnessRear = scale_tire_stiffness(ret.mass, ret.wheelbase, ret.centerToFront)
 
+    params = Params()
+    ret.personalTune = params.get_bool("PersonalTune")
+    ret.experimentalPersonalTune = params.get_bool("ExperimentalPersonalTune")
+
     return ret
 
   @staticmethod

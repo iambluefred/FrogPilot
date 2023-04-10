@@ -5,6 +5,7 @@ from typing import Dict, List, Union
 
 from cereal import car
 from common.conversions import Conversions as CV
+from common.params import Params
 from selfdrive.car import dbc_dict
 from selfdrive.car.docs_definitions import CarFootnote, CarInfo, Column, Harness
 from selfdrive.car.fw_query_definitions import FwQueryConfig, Request, StdQueries
@@ -16,6 +17,7 @@ PEDAL_TRANSITION = 10. * CV.MPH_TO_MS
 
 class CarControllerParams:
   ACCEL_MAX = 1.5  # m/s2, lower than allowed 2.0 m/s2 for tuning reasons
+  ACCEL_MAX_PERSONAL_TUNE = 2.0  # m/s2
   ACCEL_MIN = -3.5  # m/s2
 
   STEER_STEP = 1

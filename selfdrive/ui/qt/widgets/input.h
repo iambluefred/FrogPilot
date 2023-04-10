@@ -60,6 +60,7 @@ public:
   static bool confirm(const QString &prompt_text, const QString &confirm_text, QWidget *parent);
   static bool rich(const QString &prompt_text, QWidget *parent);
   static bool toggle(const QString &prompt_text, const QString &confirm_text, QWidget *parent);
+  static bool toggleAlert(const QString &prompt_text, const QString &button_text, QWidget *parent);
 };
 
 class MultiOptionDialog : public QDialogBase {

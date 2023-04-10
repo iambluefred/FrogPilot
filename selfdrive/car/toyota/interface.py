@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from cereal import car
 from common.conversions import Conversions as CV
+from common.params import Params
 from panda import Panda
 from selfdrive.car.toyota.values import Ecu, CAR, DBC, ToyotaFlags, CarControllerParams, TSS2_CAR, RADAR_ACC_CAR, NO_DSU_CAR, \
                                         MIN_ACC_SPEED, EPS_SCALE, EV_HYBRID_CAR, UNSUPPORTED_DSU_CAR, NO_STOP_TIMER_CAR, ANGLE_CONTROL_CAR
@@ -13,7 +14,7 @@ EventName = car.CarEvent.EventName
 class CarInterface(CarInterfaceBase):
   @staticmethod
   def get_pid_accel_limits(CP, current_speed, cruise_speed):
-    return CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX
+    return CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX_PERSONAL_TUNE if CP.personalTune else CarControllerParams.ACCEL_MAX
 
   @staticmethod
   def _get_params(ret, candidate, fingerprint, car_fw, experimental_long):
@@ -233,7 +234,31 @@ class CarInterface(CarInterfaceBase):
     tune = ret.longitudinalTuning
     tune.deadzoneBP = [0., 9.]
     tune.deadzoneV = [.0, .15]
-    if candidate in TSS2_CAR or ret.enableGasInterceptor:
+    if (candidate in TSS2_CAR or ret.enableGasInterceptor) and ret.experimentalPersonalTune:
+      tune.kpBP = [0., 5., 20.]
+      tune.kpV = [1.3, 1.0, 0.7]
+      tune.kiBP = [0., 3., 4., 5., 12., 20., 23., 40.]
+      tune.kiV = [.08, .16, .26, .215, .20, .166, .1, .006]
+      if candidate in TSS2_CAR:
+        ret.vEgoStopping = 0.1         # car is near 0.1 to 0.2 when car starts requesting stopping accel
+        ret.vEgoStarting = 0.1         # needs to be > or == vEgoStopping
+        ret.stopAccel = -0.4           # Toyota requests -0.4 when stopped
+        ret.stoppingDecelRate = 0.04   # reach stopping target smoothly
+        ret.longitudinalActuatorDelayLowerBound = 0.2
+        ret.longitudinalActuatorDelayUpperBound = 0.2
+    elif (candidate in TSS2_CAR or ret.enableGasInterceptor) and ret.personalTune:
+      tune.kpBP = [0., 5., 20.]
+      tune.kpV = [1.3, 1.0, 0.7]
+      tune.kiBP = [0., 5.6, 6.7, 8.3, 11.1, 19.4, 30., 33., 40.]
+      tune.kiV = [.098, .126, .152, .164, .1826, .1874, .15, .09, .01]
+      if candidate in TSS2_CAR:
+        ret.vEgoStopping = 0.2          # car is near 0.1 to 0.2 when car starts requesting stopping accel
+        ret.vEgoStarting = 0.2          # needs to be > or == vEgoStopping
+        ret.stopAccel = -0.4            # Toyota requests -0.4 when stopped
+        ret.stoppingDecelRate = 0.009   # reach stopping target smoothly
+        ret.longitudinalActuatorDelayLowerBound = 0.2
+        ret.longitudinalActuatorDelayUpperBound = 0.2
+    elif candidate in TSS2_CAR or ret.enableGasInterceptor:
       tune.kpBP = [0., 5., 20.]
       tune.kpV = [1.3, 1.0, 0.7]
       tune.kiBP = [0., 5., 12., 20., 27.]

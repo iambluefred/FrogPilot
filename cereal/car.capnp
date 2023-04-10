@@ -488,6 +488,8 @@ struct CarParams {
   wheelSpeedFactor @63 :Float32; # Multiplier on wheels speeds to computer actual speeds
 
   adjustableFollow @72: Bool;
+  personalTune @73: Bool;
+  experimentalPersonalTune @74: Bool;
 
   struct SafetyConfig {
     safetyModel @0 :SafetyModel;

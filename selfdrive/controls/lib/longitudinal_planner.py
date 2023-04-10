@@ -6,6 +6,7 @@ from common.numpy_fast import clip, interp
 import cereal.messaging as messaging
 from common.conversions import Conversions as CV
 from common.filter_simple import FirstOrderFilter
+from common.params import Params
 from common.realtime import DT_MDL
 from selfdrive.modeld.constants import T_IDXS
 from selfdrive.controls.lib.longcontrol import LongCtrlState
@@ -17,6 +18,7 @@ from system.swaglog import cloudlog
 LON_MPC_STEP = 0.2  # first step is 0.2s
 A_CRUISE_MIN = -1.2
 A_CRUISE_MAX_VALS = [1.6, 1.2, 0.8, 0.6]
+A_CRUISE_MAX_VALS_PERSONAL_TUNE = [1.6, 2.0, 1.2, 1.0]
 A_CRUISE_MAX_BP = [0., 10.0, 25., 40.]
 
 # Lookup table for turns
@@ -27,6 +29,8 @@ _A_TOTAL_MAX_BP = [20., 40.]
 def get_max_accel(v_ego):
   return interp(v_ego, A_CRUISE_MAX_BP, A_CRUISE_MAX_VALS)
 
+def get_max_accel_personal_tune(v_ego):
+  return interp(v_ego, A_CRUISE_MAX_BP, A_CRUISE_MAX_VALS_PERSONAL_TUNE)
 
 def limit_accel_in_turns(v_ego, angle_steers, a_target, CP):
   """
@@ -57,6 +61,8 @@ class LongitudinalPlanner:
     self.a_desired_trajectory = np.zeros(CONTROL_N)
     self.j_desired_trajectory = np.zeros(CONTROL_N)
     self.solverExecutionTime = 0.0
+
+    self.personal_tune = self.CP.personalTune
 
   @staticmethod
   def parse_model(model_msg, model_error):
@@ -92,7 +98,10 @@ class LongitudinalPlanner:
     prev_accel_constraint = not (reset_state or sm['carState'].standstill)
 
     if self.mpc.mode == 'acc':
-      accel_limits = [A_CRUISE_MIN, get_max_accel(v_ego)]
+      if self.personal_tune:
+        accel_limits = [A_CRUISE_MIN, get_max_accel_personal_tune(v_ego)]
+      else:
+        accel_limits = [A_CRUISE_MIN, get_max_accel(v_ego)]
       accel_limits_turns = limit_accel_in_turns(v_ego, sm['carState'].steeringAngleDeg, accel_limits, self.CP)
     else:
       accel_limits = [MIN_ACCEL, MAX_ACCEL]

@@ -243,6 +243,11 @@ bool ConfirmationDialog::toggle(const QString &prompt_text, const QString &confi
   return d.exec();
 }
 
+bool ConfirmationDialog::toggleAlert(const QString &prompt_text, const QString &button_text, QWidget *parent) {
+  ConfirmationDialog d = ConfirmationDialog(prompt_text, button_text, "", false, parent);
+  return d.exec();
+}
+
 // MultiOptionDialog
 
 MultiOptionDialog::MultiOptionDialog(const QString &prompt_text, const QStringList &l, const QString &current, QWidget *parent) : QDialogBase(parent) {
