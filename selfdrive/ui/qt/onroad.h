@@ -31,6 +31,7 @@ private:
 
 class ExperimentalButton : public QPushButton {
   Q_OBJECT
+  Q_PROPERTY(bool rotatingWheel MEMBER rotatingWheel);
 
 public:
   explicit ExperimentalButton(QWidget *parent = 0);
@@ -40,6 +41,7 @@ private:
   void paintEvent(QPaintEvent *event) override;
 
   Params params;
+  bool rotatingWheel;
   QPixmap engage_img;
   QPixmap experimental_img;
 };
@@ -63,6 +65,8 @@ class AnnotatedCameraWidget : public CameraWidget {
 
   Q_PROPERTY(bool frogColors MEMBER frogColors);
   Q_PROPERTY(bool muteDM MEMBER muteDM);
+  Q_PROPERTY(bool rotatingWheel MEMBER rotatingWheel);
+  Q_PROPERTY(int steering_angle_deg MEMBER steering_angle_deg);
 
 public:
   explicit AnnotatedCameraWidget(VisionStreamType type, QWidget* parent = 0);
@@ -70,10 +74,13 @@ public:
 
 private:
   void drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity);
+  void drawIconRotate(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity, int angle_deg = 0);
   void drawText(QPainter &p, int x, int y, const QString &text, int alpha = 255);
 
   ExperimentalButton *experimental_btn;
   QPixmap dm_img;
+  QPixmap engage_img;
+  QPixmap experimental_img;
   float speed;
   QString speedUnit;
   float setSpeed;
@@ -89,7 +96,9 @@ private:
   bool v_ego_cluster_seen = false;
   bool frogColors;
   bool muteDM;
+  bool rotatingWheel;
   int status = STATUS_DISENGAGED;
+  int steering_angle_deg = 0;
   std::unique_ptr<PubMaster> pm;
 
   int skip_frame_count = 0;

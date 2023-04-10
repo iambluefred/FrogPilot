@@ -192,9 +192,11 @@ ExperimentalButton::ExperimentalButton(QWidget *parent) : QPushButton(parent) {
 void ExperimentalButton::updateState(const UIState &s) {
   const SubMaster &sm = *(s.sm);
 
-  // button is "visible" if engageable or enabled
+  setProperty("rotatingWheel", s.scene.rotating_wheel);
+
+  // button is "visible" if engageable or enabled and rotating steering wheel isn't toggled on
   const auto cs = sm["controlsState"].getControlsState();
-  setVisible(cs.getEngageable() || cs.getEnabled());
+  setVisible((cs.getEngageable() || cs.getEnabled()) & !rotatingWheel);
 
   // button is "checked" if experimental mode is enabled
   setChecked(sm["controlsState"].getControlsState().getExperimentalMode());
@@ -292,6 +294,8 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
 
   setProperty("frogColors", s.scene.frog_colors);
   setProperty("muteDM", s.scene.mute_dm);
+  setProperty("rotatingWheel", s.scene.rotating_wheel);
+  setProperty("steering_angle_deg", s.scene.steering_angle);
 }
 
 void AnnotatedCameraWidget::drawHud(QPainter &p) {
@@ -442,6 +446,15 @@ void AnnotatedCameraWidget::drawHud(QPainter &p) {
   drawText(p, rect().center().x(), 290, speedUnit, 200);
 
   p.restore();
+
+  if (rotatingWheel) {
+    engage_img = loadPixmap("../assets/img_chffr_wheel.png", {img_size, img_size});
+    experimental_img = loadPixmap("../assets/img_experimental.svg", {img_size, img_size});
+    SubMaster &sm = *(uiState()->sm);
+    drawIconRotate(p, rect().right() - btn_size / 2 - bdr_s * 2 + 25, btn_size / 2 + int(bdr_s * 1.5) - 20,
+                   sm["controlsState"].getControlsState().getExperimentalMode() ? experimental_img : engage_img,
+                   (sm["controlsState"].getControlsState().getExperimentalMode() ? QColor(218, 111, 37, 241) : blackColor(166)), 1.0, steering_angle_deg);
+  }
 }
 
 
@@ -465,6 +478,18 @@ void AnnotatedCameraWidget::drawIcon(QPainter &p, int x, int y, QPixmap &img, QB
   p.drawPixmap(x - img.size().width() / 2, y - img.size().height() / 2, img);
 }
 
+void AnnotatedCameraWidget::drawIconRotate(QPainter &p, int x, int y, QPixmap &img, QBrush bg, float opacity, int angle_deg) {
+  p.setOpacity(1.0);
+  p.setPen(Qt::NoPen);
+  p.setBrush(bg);
+  p.drawEllipse(x - btn_size / 2, y - btn_size / 2, btn_size, btn_size);
+  p.setOpacity(opacity);
+  p.save();
+  p.translate(x, y);
+  p.rotate(-angle_deg);
+  p.drawPixmap(-img.size().width() / 2, -img.size().height() / 2, img);
+  p.restore();
+}
 
 void AnnotatedCameraWidget::initializeGL() {
   CameraWidget::initializeGL();

@@ -128,7 +128,9 @@ typedef struct UIScene {
   bool full_brightness;
   bool isFrogTheme;
   bool mute_dm;
+  bool rotating_wheel;
   bool wide_camera_disable;
+  int steering_angle = 0;
 
 } UIScene;
 

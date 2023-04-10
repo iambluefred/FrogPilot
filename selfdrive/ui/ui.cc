@@ -204,6 +204,9 @@ static void update_state(UIState *s) {
     float scale = (sm["wideRoadCameraState"].getWideRoadCameraState().getSensor() == cereal::FrameData::ImageSensor::AR0231) ? 6.0f : 1.0f;
     scene.light_sensor = std::max(100.0f - scale * sm["wideRoadCameraState"].getWideRoadCameraState().getExposureValPercent(), 0.0f);
   }
+  if (sm.updated("carState")) {
+    scene.steering_angle = (int)sm["carState"].getCarState().getSteeringAngleDeg();
+  }
   scene.started = sm["deviceState"].getDeviceState().getStarted() && scene.ignition;
 }
 
@@ -215,6 +218,7 @@ void ui_update_params(UIState *s) {
   s->scene.is_metric = params.getBool("IsMetric");
   s->scene.map_on_left = params.getBool("NavSettingLeftSide");
   s->scene.mute_dm = params.getBool("FireTheBabysitter") && params.getBool("MuteDM");
+  s->scene.rotating_wheel = params.getBool("RotatingWheel");
   s->scene.wide_camera_disable = params.getBool("WideCameraDisable");
 }
 
