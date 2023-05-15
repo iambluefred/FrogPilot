@@ -405,6 +405,9 @@ def thermald_thread(end_event, hw_queue):
 
     count += 1
 
+    # Create the prebuilt file if it doesn't exist
+    if not os.path.isfile('/data/openpilot/prebuilt'):
+      os.system(f"touch {'/data/openpilot/prebuilt'}")
 
 def main():
   hw_queue = queue.Queue(maxsize=1)
