@@ -13,6 +13,7 @@ class Sidebar : public QFrame {
   Q_PROPERTY(ItemStatus connectStatus MEMBER connect_status NOTIFY valueChanged);
   Q_PROPERTY(ItemStatus pandaStatus MEMBER panda_status NOTIFY valueChanged);
   Q_PROPERTY(ItemStatus tempStatus MEMBER temp_status NOTIFY valueChanged);
+  Q_PROPERTY(QString ambientTemp MEMBER ambient_temp NOTIFY valueChanged);
   Q_PROPERTY(QString netType MEMBER net_type NOTIFY valueChanged);
   Q_PROPERTY(int netStrength MEMBER net_strength NOTIFY valueChanged);
 
@@ -64,5 +65,7 @@ private:
   // FrogPilot variables
   bool isFrogColors;
   bool isFrogIcons;
+  bool isNumericalTemp;
   QPixmap frog_home_img, frog_settings_img;
+  QString ambient_temp;
 };
