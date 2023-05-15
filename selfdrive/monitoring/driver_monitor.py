@@ -4,6 +4,7 @@ from cereal import car
 from common.numpy_fast import interp
 from common.realtime import DT_DMON
 from common.filter_simple import FirstOrderFilter
+from common.params import Params
 from common.stat_live import RunningStatFilter
 from common.transformations.camera import tici_d_frame_size
 
@@ -155,6 +156,11 @@ class DriverStatus():
     self.threshold_prompt = self.settings._DISTRACTED_PROMPT_TIME_TILL_TERMINAL / self.settings._DISTRACTED_TIME
 
     self._set_timers(active_monitoring=True)
+
+    # FrogPilot variables
+    params = Params()
+    fire_the_babysitter = params.get_bool("FireTheBabysitter")
+    self.mute_dm = fire_the_babysitter and params.get_bool("MuteDM")
 
   def _reset_awareness(self):
     self.awareness = 1.
@@ -318,7 +324,7 @@ class DriverStatus():
     maybe_distracted = self.hi_stds > self.settings._HI_STD_FALLBACK_TIME or not self.face_detected
     if certainly_distracted or maybe_distracted:
       # should always be counting if distracted unless at standstill and reaching orange
-      if not standstill_exemption:
+      if not standstill_exemption and not self.mute_dm:
         self.awareness = max(self.awareness - self.step_change, -0.1)
 
     alert = None

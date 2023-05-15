@@ -219,6 +219,7 @@ void ui_update_params(UIState *s) {
   // FrogPilot variables
   const bool frog_theme = params.getBool("FrogTheme");
   scene.frog_colors = frog_theme && params.getBool("FrogColors");
+  scene.mute_dm = params.getBool("FireTheBabysitter") && params.getBool("MuteDM");
   scene.wide_camera_disabled = params.getBool("WideCameraDisable");
 }
 

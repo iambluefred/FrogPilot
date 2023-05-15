@@ -9,6 +9,7 @@ from common.basedir import BASEDIR
 from common.conversions import Conversions as CV
 from common.kalman.simple_kalman import KF1D
 from common.numpy_fast import clip
+from common.params import Params
 from common.realtime import DT_CTRL
 from selfdrive.car import apply_hysteresis, gen_empty_fingerprint, scale_rot_inertia, scale_tire_stiffness
 from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX, get_friction
@@ -83,6 +84,12 @@ class CarInterfaceBase(ABC):
     self.CC = None
     if CarController is not None:
       self.CC = CarController(self.cp.dbc_name, CP, self.VM)
+
+    # FrogPilot variables
+    params = Params()
+    fire_the_babysitter = params.get_bool("FireTheBabysitter")
+    self.mute_door = fire_the_babysitter and params.get_bool("MuteDoor")
+    self.mute_seatbelt = fire_the_babysitter and params.get_bool("MuteSeatbelt")
 
   @staticmethod
   def get_pid_accel_limits(CP, current_speed, cruise_speed):
@@ -237,9 +244,9 @@ class CarInterfaceBase(ABC):
                            enable_buttons=(ButtonType.accelCruise, ButtonType.decelCruise)):
     events = Events()
 
-    if cs_out.doorOpen:
+    if cs_out.doorOpen and not self.mute_door:
       events.add(EventName.doorOpen)
-    if cs_out.seatbeltUnlatched:
+    if cs_out.seatbeltUnlatched and not self.mute_seatbelt:
       events.add(EventName.seatbeltNotLatched)
     if cs_out.gearShifter != GearShifter.drive and (extra_gears is None or
        cs_out.gearShifter not in extra_gears):
