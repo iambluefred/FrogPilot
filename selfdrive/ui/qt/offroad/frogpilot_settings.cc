@@ -13,7 +13,8 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
 
   const std::vector<std::tuple<QString, QString, QString, QString>> toggles = {
     {"FrogTheme", "FrogPilot Theme", "Enable the beloved FrogPilot Theme! Disable toggle to revert back to the stock openpilot theme.", "../assets/images/frog_button_home.png"},
-    {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"}
+    {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"},
+    {"ScreenBrightness", "Screen Brightness", "Choose a custom screen brightness level or use the default 'Auto' brightness setting.", "../assets/offroad/icon_light.png"}
   };
 
   for (int i = 0; i < toggles.size(); i++) {
@@ -24,6 +25,9 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
         {"FrogIcons", "FrogPilot Icons", "Replace stock openpilot icons with FrogPilot's."},
         {"FrogSounds", "FrogPilot Sounds", "Replace stock openpilot sounds with FrogPilot's."}
       });
+    } else if (key == "ScreenBrightness") {
+      mainLayout->addWidget(new ScreenBrightness());
+      mainLayout->addWidget(horizontal_line());
     } else {
       mainLayout->addWidget(createParamControl(key, label, desc, icon, parent));
       if (i != toggles.size() - 1) mainLayout->addWidget(horizontal_line());

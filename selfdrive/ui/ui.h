@@ -127,6 +127,7 @@ typedef struct UIScene {
   // FrogPilot variables
   bool experimental_mode;
   bool frog_colors;
+  int screen_brightness;
 
 } UIScene;
 
