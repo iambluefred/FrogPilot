@@ -413,8 +413,8 @@ def main() -> None:
     cloudlog.event("update installed")
 
   if not params.get("InstallDate"):
-    t = datetime.datetime.utcnow().isoformat()
-    params.put("InstallDate", t.encode('utf8'))
+    current_datetime = datetime.datetime.now().astimezone().strftime("%B %d, %Y - %I:%M%p")
+    params.put("InstallDate", current_datetime)
 
   updater = Updater()
   update_failed_count = 0  # TODO: Load from param?

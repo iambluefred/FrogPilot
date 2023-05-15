@@ -4,6 +4,7 @@
 #include <cmath>
 #include <string>
 
+#include <QDateTime>
 #include <QDebug>
 #include <QLabel>
 
@@ -44,6 +45,9 @@ SoftwarePanel::SoftwarePanel(QWidget* parent) : ListWidget(parent) {
   // install update btn
   installBtn = new ButtonControl(tr("Install Update"), tr("INSTALL"));
   connect(installBtn, &ButtonControl::clicked, [=]() {
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString currentDateTimeStr = currentDateTime.toString("MMMM d, yyyy - h:mma");
+    params.put("Updated", currentDateTimeStr.toStdString());
     installBtn->setEnabled(false);
     params.putBool("DoReboot", true);
   });
