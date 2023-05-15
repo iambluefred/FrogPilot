@@ -1,6 +1,8 @@
 from cereal import log
 from common.conversions import Conversions as CV
+from common.params import Params
 from common.realtime import DT_MDL
+import numpy as np
 
 LaneChangeState = log.LateralPlan.LaneChangeState
 LaneChangeDirection = log.LateralPlan.LaneChangeDirection
@@ -40,10 +42,42 @@ class DesireHelper:
     self.prev_one_blinker = False
     self.desire = log.LateralPlan.Desire.none
 
-  def update(self, carstate, lateral_active, lane_change_prob):
+    # FrogPilot variables
+    params = Params()
+    self.nudgeless = params.get_bool("NudgelessLaneChange")
+    self.lane_detection = self.nudgeless and params.get_bool("LaneDetection")
+    self.one_lane_change = self.nudgeless and params.get_bool("OneLaneChange")
+    self.lane_available = True
+    self.lane_change_completed = False
+
+  def update(self, carstate, lateral_active, lane_change_prob, md):
     v_ego = carstate.vEgo
     one_blinker = carstate.leftBlinker != carstate.rightBlinker
     below_lane_change_speed = v_ego < LANE_CHANGE_SPEED_MIN
+
+    # Lane detection
+    if self.lane_detection and one_blinker:
+      # Set the minimum lane threshold to 3.0 meters
+      min_lane_threshold = 3.0
+      # Set the blinker index based on which signal is on
+      blinker_index = 0 if carstate.leftBlinker else 1
+      desired_edge = md.roadEdges[blinker_index]
+      current_lane = md.laneLines[blinker_index + 1]
+      # Check if both the desired lane and the current lane have valid x and y values
+      if all([desired_edge.x, desired_edge.y, current_lane.x, current_lane.y]) and len(desired_edge.x) == len(current_lane.x):
+        # Interpolate the x and y values to the same length
+        x = np.linspace(desired_edge.x[0], desired_edge.x[-1], num=len(desired_edge.x))
+        lane_y = np.interp(x, current_lane.x, current_lane.y)
+        desired_y = np.interp(x, desired_edge.x, desired_edge.y)
+        # Calculate the width of the lane we're wanting to change into
+        lane_width = np.abs(desired_y - lane_y)
+        # Set lane_available to True if the maximum width of the lane is greater than or equal to the minimum lane threshold
+        self.lane_available = np.amax(lane_width) >= min_lane_threshold
+      else:
+        self.lane_available = False
+    else:
+      # Default to setting "lane_available" to True
+      self.lane_available = True
 
     if not lateral_active or self.lane_change_timer > LANE_CHANGE_TIME_MAX:
       self.lane_change_state = LaneChangeState.off
@@ -64,6 +98,10 @@ class DesireHelper:
                          ((carstate.steeringTorque > 0 and self.lane_change_direction == LaneChangeDirection.left) or
                           (carstate.steeringTorque < 0 and self.lane_change_direction == LaneChangeDirection.right))
 
+        # Conduct a nudgeless lane change if all the conditions are in place
+        if self.nudgeless and self.lane_available and not self.lane_change_completed:
+          torque_applied = True
+
         blindspot_detected = ((carstate.leftBlindspot and self.lane_change_direction == LaneChangeDirection.left) or
                               (carstate.rightBlindspot and self.lane_change_direction == LaneChangeDirection.right))
 
@@ -71,6 +109,8 @@ class DesireHelper:
           self.lane_change_state = LaneChangeState.off
         elif torque_applied and not blindspot_detected:
           self.lane_change_state = LaneChangeState.laneChangeStarting
+          # Set the "lane_change_completed" flag to prevent any more lane changes if the toggle is on
+          self.lane_change_completed = True if self.one_lane_change else False
 
       # LaneChangeState.laneChangeStarting
       elif self.lane_change_state == LaneChangeState.laneChangeStarting:
@@ -92,6 +132,8 @@ class DesireHelper:
             self.lane_change_state = LaneChangeState.preLaneChange
           else:
             self.lane_change_state = LaneChangeState.off
+            # Reset the "lane_change_completed" flag
+            self.lane_change_completed = False
 
     if self.lane_change_state in (LaneChangeState.off, LaneChangeState.preLaneChange):
       self.lane_change_timer = 0.0
