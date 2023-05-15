@@ -63,6 +63,7 @@ def manager_init() -> None:
     ("RotatingWheel", "1"),
     ("ScreenBrightness", "100"),
     ("Sidebar", "1"),
+    ("SteeringWheel", "1"),
     ("WideCameraDisable", "1"),
   ]
   if not PC:

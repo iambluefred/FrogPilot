@@ -189,6 +189,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"SnoozeUpdate", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
     {"Sidebar", PERSISTENT},
     {"SshEnabled", PERSISTENT},
+    {"SteeringWheel", PERSISTENT},
     {"SubscriberInfo", PERSISTENT},
     {"TermsVersion", PERSISTENT},
     {"Timezone", PERSISTENT},

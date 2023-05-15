@@ -80,6 +80,7 @@ class className : public ParamValueControl { \
 public: \
   className() : ParamValueControl(labelText, descText, iconPath) { refresh(); } \
 private: \
+  QMap<int, QString> wheelLabels = {{0, "Stock"}, {1, "Lexus"}, {2, "Toyota"}, {3, "Frog"}, {4, "Rocket"}}; \
   void refresh() override { \
     label.setText(getValueStr()); \
     params.putBool("FrogPilotTogglesUpdated", true); \
@@ -104,4 +105,9 @@ ParamControllerInt(ScreenBrightness, "ScreenBrightness", "Screen Brightness", "S
   int brightness = params.getInt("ScreenBrightness");
   return brightness == 101 ? "Auto" : brightness == 0 ? "Screen Off" : QString::number(brightness) + "%";,
   return std::clamp(v, 0, 101);
+)
+
+ParamControllerInt(SteeringWheel, "SteeringWheel", "Steering Wheel Icon", "Replace the stock openpilot steering wheel icon with a custom icon.\n\nWant to submit your own steering wheel? Message me on Discord:\nFrogsGoMoo #6969.", "../assets/offroad/icon_openpilot.png",
+  return wheelLabels[params.getInt("SteeringWheel")];,
+  return (v + 5) % 5;
 )
