@@ -112,6 +112,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"ExperimentalMode", PERSISTENT},
     {"ExperimentalModeConfirmed", PERSISTENT},
     {"ExperimentalLongitudinalEnabled", PERSISTENT},
+    {"ExperimentalPersonalTune", PERSISTENT},
     {"DisableAd", PERSISTENT},
     {"DisableUpdates", PERSISTENT},
     {"DisengageOnAccelerator", PERSISTENT},
@@ -187,6 +188,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"Passive", PERSISTENT},
     {"PathEdgeWidth", PERSISTENT},
     {"PathWidth", PERSISTENT},
+    {"PersonalTune", PERSISTENT},
     {"PrimeType", PERSISTENT},
     {"RecordFront", PERSISTENT},
     {"RecordFrontLock", PERSISTENT},  // for the internal fleet

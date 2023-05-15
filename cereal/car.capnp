@@ -495,6 +495,8 @@ struct CarParams {
 
   # FrogPilot CarParams
   adjustableFollow @72 :Bool;
+  experimentalPersonalTune @73 :Bool;
+  personalTune @74 :Bool;
 
   struct SafetyConfig {
     safetyModel @0 :SafetyModel;
