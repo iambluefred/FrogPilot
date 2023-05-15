@@ -39,7 +39,7 @@ class CarInterface(CarInterfaceBase):
     return ret
 
   # returns a car.CarState
-  def _update(self, c, adjustable_follow, experimental_mode_via_wheel):
+  def _update(self, c, adjustable_follow, conditional_experimental_mode, experimental_mode_via_wheel):
     ret = self.CS.update(self.cp, self.cp_adas, self.cp_cam)
 
     buttonEvents = []

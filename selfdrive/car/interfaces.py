@@ -88,6 +88,7 @@ class CarInterfaceBase(ABC):
     # FrogPilot variables
     params = Params()
     self.adjustable_follow = self.CP.adjustableFollow
+    self.conditional_experimental_mode = self.CP.conditionalExperimentalMode
     self.experimental_mode_via_wheel = self.CP.experimentalModeViaWheel
     fire_the_babysitter = params.get_bool("FireTheBabysitter")
     self.mute_door = fire_the_babysitter and params.get_bool("MuteDoor")
@@ -189,6 +190,7 @@ class CarInterfaceBase(ABC):
     # FrogPilot variables
     params = Params()
     ret.adjustableFollow = params.get_bool("AdjustableFollowDistance")
+    ret.conditionalExperimentalMode = params.get_bool("ConditionalExperimentalMode")
     ret.experimentalModeViaWheel = params.get_bool("ExperimentalModeViaWheel")
     ret.experimentalPersonalTune = params.get_bool("PersonalTune") and params.get_bool("ExperimentalPersonalTune")
     ret.personalTune = params.get_bool("PersonalTune")
@@ -219,7 +221,7 @@ class CarInterfaceBase(ABC):
         cp.update_strings(can_strings)
 
     # get CarState
-    ret = self._update(c, self.adjustable_follow, self.experimental_mode_via_wheel)
+    ret = self._update(c, self.adjustable_follow, self.conditional_experimental_mode, self.experimental_mode_via_wheel)
 
     ret.canValid = all(cp.can_valid for cp in self.can_parsers if cp is not None)
     ret.canTimeout = any(cp.bus_timeout for cp in self.can_parsers if cp is not None)

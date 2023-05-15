@@ -961,6 +961,8 @@ struct LongitudinalPlan @0xe00b5b3eba12876c {
   jerks @34 :List(Float32);
 
   solverExecutionTime @35 :Float32;
+  
+  conditionalExperimentalMode @36 :Bool;
 
   enum LongitudinalPlanSource {
     cruise @0;

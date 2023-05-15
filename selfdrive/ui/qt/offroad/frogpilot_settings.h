@@ -95,6 +95,18 @@ private: \
   int newValue(int v) { newValueFunc } \
 };
 
+ParamControllerInt(ConditionalExperimentalModeSpeed, "ConditionalExperimentalModeSpeed", "   Experimental Mode Below (Lead)", "Switch to 'Experimental Mode' below this speed when there is no lead car in order to take advantage of red lights and stop signs.", "../assets/offroad/icon_blank.png",
+  int value = params.getInt("ConditionalExperimentalModeSpeed");
+  return value == 0 ? "Off" : QString::number(value) + "mph";,
+  return std::clamp(v, 0, 99);
+)
+
+ParamControllerInt(ConditionalExperimentalModeSpeedLead, "ConditionalExperimentalModeSpeedLead", "   Experimental Mode Below (No Lead)", "Switch to 'Experimental Mode' below this speed in order to take advantage of red lights and stop signs.", "../assets/offroad/icon_blank.png",
+  int value = params.getInt("ConditionalExperimentalModeSpeedLead");
+  return value == 0 ? "Off" : QString::number(value) + "mph";,
+  return std::clamp(v, 0, 99);
+)
+
 ParamControllerInt(DeviceShutdownTimer, "DeviceShutdownTimer", "Device Shutdown Timer", "Set the timer for when the device turns off after being offroad to reduce energy waste and prevent battery drain.", "../assets/offroad/icon_time.png",
   int value = params.getInt("DeviceShutdownTimer");
   return value == 0 ? "Instant" : QString::number(value) + " hours";,

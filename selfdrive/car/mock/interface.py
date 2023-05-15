@@ -32,7 +32,7 @@ class CarInterface(CarInterfaceBase):
     return ret
 
   # returns a car.CarState
-  def _update(self, c, adjustable_follow, experimental_mode_via_wheel):
+  def _update(self, c, adjustable_follow, conditional_experimental_mode, experimental_mode_via_wheel):
     self.sm.update(0)
     gps_sock = 'gpsLocationExternal' if self.sm.rcv_frame['gpsLocationExternal'] > 1 else 'gpsLocation'
     if self.sm.updated[gps_sock]:

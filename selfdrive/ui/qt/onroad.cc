@@ -106,7 +106,7 @@ void OnroadWindow::mousePressEvent(QMouseEvent* e) {
 
   // Adjustable follow distance button
   int x = rightHandDM ? rect().right() - (btn_size - 24) / 2 - (bdr_s * 2) - x_offset : (btn_size - 24) / 2 + (bdr_s * 2) + x_offset;
-  const int y = rect().bottom() - footer_h / 2;
+  const int y = rect().bottom() - (scene.conditional_experimental ? 20 : 0) - footer_h / 2;
   QPoint adjustableFollowDistanceCenter(x, y);
   // Give the button a 25% offset so it doesn't need to be clicked on perfectly
   constexpr int adjustableFollowDistanceRadius = btn_size * 1.25;
@@ -119,7 +119,11 @@ void OnroadWindow::mousePressEvent(QMouseEvent* e) {
   // If the click wasn't on the button for adjustableFollowDistances, change the value of "ExperimentalMode" and "ExperimentalModeOverride"
   } else if (recentlyTapped && isExperimentalModewheel) {
     bool experimentalMode = params.getBool("ExperimentalMode");
-    params.putBool("ExperimentalMode", !experimentalMode);
+    if (scene.conditional_experimental) {
+      params.putInt("ExperimentalModeOverride", scene.experimental_mode_override != 0 ? 0 : experimentalMode ? 1 : 2);
+    } else {
+      params.putBool("ExperimentalMode", !experimentalMode);
+    }
     recentlyTapped = false;
   } else {
     recentlyTapped = true;
@@ -277,7 +281,7 @@ void ExperimentalButton::paintEvent(QPaintEvent *event) {
 
     p.setOpacity(1.0);
     p.setPen(Qt::NoPen);
-    p.setBrush(steeringWheel && isChecked() ? QColor(218, 111, 37, 241) : QColor(0, 0, 0, 166));
+    p.setBrush(scene.conditional_status == 1 ? QColor(255, 246, 0, 255) : steeringWheel && isChecked() ? QColor(218, 111, 37, 241) : QColor(0, 0, 0, 166));
     p.drawEllipse(center, btn_size / 2, btn_size / 2);
     p.setOpacity(isDown() ? 0.8 : 1.0);
     p.drawPixmap((btn_size - img_size) / 2, (btn_size - img_size) / 2, img);
@@ -404,6 +408,11 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
   setProperty("blindspotLeft", s.scene.blindspot_left);
   setProperty("blindspotRight", s.scene.blindspot_right);
   setProperty("compass", s.scene.compass);
+  setProperty("conditionalExperimental", s.scene.conditional_experimental);
+  setProperty("conditionalOverridden", s.scene.conditional_overridden);
+  setProperty("conditionalSpeed", s.scene.conditional_speed);
+  setProperty("conditionalSpeedLead", s.scene.conditional_speed_lead);
+  setProperty("conditionalStatus", s.scene.conditional_status);
   setProperty("experimentalMode", s.scene.experimental_mode);
   setProperty("frogColors", s.scene.frog_colors);
   setProperty("frogSignals", s.scene.frog_signals);
@@ -583,6 +592,11 @@ void AnnotatedCameraWidget::drawHud(QPainter &p) {
   if (adjustableFollowDistance && !adjustableFollowDistanceCar && (!frogSignals || (frogSignals && !turnSignalLeft && !turnSignalRight))) {
     drawAdjustableFollowDistance(p);
   }
+
+  // Conditional experimental mode status bar
+  if (conditionalExperimental) {
+    drawConditionalExperimentalStatus(p);
+  }
 }
 
 
@@ -607,6 +621,8 @@ void AnnotatedCameraWidget::drawIcon(QPainter &p, int x, int y, QPixmap &img, QB
 }
 
 void AnnotatedCameraWidget::drawIconRotate(QPainter &p, int x, int y) {
+  // Variable declarations
+  const auto &scene = uiState()->scene;
   // Custom steering wheel icon
   engage_img = wheel_images[steeringWheel];
 
@@ -619,7 +635,7 @@ void AnnotatedCameraWidget::drawIconRotate(QPainter &p, int x, int y) {
   // Draw the icon and rotate it alongside the steering wheel
   p.setOpacity(1.0);
   p.setPen(Qt::NoPen);
-  p.setBrush(steeringWheel && experimentalMode ? QColor(218, 111, 37, 241) : QColor(0, 0, 0, 166));
+  p.setBrush(scene.conditional_status == 1 ? QColor(255, 246, 0, 255) : steeringWheel && experimentalMode ? QColor(218, 111, 37, 241) : QColor(0, 0, 0, 166));
   p.drawEllipse(x - btn_size / 2, y - btn_size / 2, btn_size, btn_size);
   p.save();
   p.translate(x, y);
@@ -735,7 +751,11 @@ void AnnotatedCameraWidget::drawLaneLines(QPainter &painter, const UIState *s) {
 
   // Paint path edges
   QLinearGradient pe(0, height(), 0, height() / 4);
-  if (experimentalMode) {
+  if (conditionalStatus == 1) {
+    pe.setColorAt(0.0, QColor::fromHslF(58 / 360., 1.0, 0.50, 1.0));
+    pe.setColorAt(0.5, QColor::fromHslF(58 / 360., 1.0, 0.50, 0.5));
+    pe.setColorAt(1.0, QColor::fromHslF(58 / 360., 1.0, 0.50, 0.1));
+  } else if (experimentalMode) {
     pe.setColorAt(0.0, QColor::fromHslF(25 / 360., 0.71, 0.50, 1.0));
     pe.setColorAt(0.5, QColor::fromHslF(25 / 360., 0.71, 0.50, 0.5));
     pe.setColorAt(1.0, QColor::fromHslF(25 / 360., 0.71, 0.50, 0.1));
@@ -762,7 +782,7 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s)
 
   // base icon
   int x = rightHandDM ? rect().right() -  (btn_size - 24) / 2 - (bdr_s * 2) : (btn_size - 24) / 2 + (bdr_s * 2);
-  int y = rect().bottom() - footer_h / 2;
+  int y = rect().bottom() - footer_h / 2 - (conditionalExperimental ? 20 : 0);
   float opacity = dmActive ? 0.65 : 0.2;
   drawIcon(painter, x, y, dm_img, blackColor(0), opacity);
 
@@ -951,7 +971,7 @@ void AnnotatedCameraWidget::drawCompass(QPainter &p) {
   constexpr int degreeLabelOffset = circle_offset + 25;
   constexpr int inner_compass = btn_size / 2;
   int x = !rightHandDM ? rect().right() - btn_size / 2 - (bdr_s * 2) - 10 : btn_size / 2 + (bdr_s * 2) + 10;
-  const int y = rect().bottom() - 20 - footer_h / 2;
+  const int y = rect().bottom() - 20 - (conditionalExperimental ? 60 : 0) - footer_h / 2;
 
   // Enable Antialiasing
   p.setRenderHint(QPainter::Antialiasing);
@@ -1035,7 +1055,7 @@ void AnnotatedCameraWidget::drawFrogSignals(QPainter &p) {
   constexpr int signalWidth = 360;
 
   // Calculate the vertical position for the turn signals
-  const int baseYPosition = (height() - signalHeight) / 2 + 300;
+  const int baseYPosition = (height() - signalHeight) / 2 + (conditionalExperimental ? 225 : 300);
   // Calculate the x-coordinates for the turn signals
   int leftSignalXPosition = width() + 75 - signalWidth - (!blindspotLeft) * 300 * animationFrameIndex;
   int rightSignalXPosition = (-75) + (!blindspotRight) * 300 * animationFrameIndex;
@@ -1073,7 +1093,7 @@ void AnnotatedCameraWidget::drawAdjustableFollowDistance(QPainter &p) {
 
   // Set the x and y coordinates
   int x = rightHandDM ? rect().right() - (btn_size - 24) / 2 - (bdr_s * 2) - (muteDM ? 50 : 250) : (btn_size - 24) / 2 + (bdr_s * 2) + (muteDM ? 50 : 250);
-  const int y = rect().bottom() - footer_h / 2;
+  const int y = rect().bottom() - (conditionalExperimental ? 20 : 0) - footer_h / 2;
 
   // Select the appropriate profile image/text
   int index = qBound(0, adjustableFollowDistanceProfile - 1, 2);
@@ -1113,4 +1133,28 @@ void AnnotatedCameraWidget::drawAdjustableFollowDistance(QPainter &p) {
   if (imageOpacity > 0.0) {
     drawIcon(p, x, y, profile_image, blackColor(0), imageOpacity);
   }
+}
+
+void AnnotatedCameraWidget::drawConditionalExperimentalStatus(QPainter &p) {
+  p.setOpacity(1.0);
+  QRect statusBarRect(rect().left(), rect().bottom() - 59, rect().width(), 60);
+  p.fillRect(statusBarRect, QColor(0, 0, 0, 150));
+
+  QString statusText = !is_cruise_set ? "Conditional Experimental Mode ready" :
+                      (conditionalOverridden == 1 ? "Conditional Experimental Mode overridden. Double press the \"LKAS\" button to revert" :
+                       conditionalOverridden == 2 ? "Experimental Mode manually activated. Double press the \"LKAS\" button to revert" :
+                       conditionalStatus == 1 ? "Conditional Experimental Mode overridden. Double tap the screen to revert" :
+                       conditionalStatus == 2 ? "Experimental Mode manually activated. Double tap the screen to revert" :
+                       conditionalStatus == 3 ? "Experimental Mode activated for turn / lane change" :
+                       conditionalStatus == 4 ? "Experimental Mode activated for stop sign / stop light" :
+                       conditionalStatus == 5 ? "Experimental Mode activated for curve" :
+                       conditionalStatus == 6 ? "Experimental Mode activated due to speed being less than " + QString::number(conditionalSpeed) + " mph" :
+                       conditionalStatus == 7 ? "Experimental Mode activated due to speed being less than " + QString::number(conditionalSpeedLead) + " mph" :
+                       "Conditional Experimental Mode ready");
+
+  configFont(p, "Inter", 40, "Bold");
+  QRect textRect = p.fontMetrics().boundingRect(statusText);
+  textRect.moveCenter(statusBarRect.center());
+  p.setPen(Qt::white);
+  p.drawText(textRect, Qt::AlignCenter, statusText);
 }

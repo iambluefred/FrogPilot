@@ -220,6 +220,7 @@ struct CarState {
   adjustableFollowCar @46 :Bool;
   distanceLines @47 :UInt8;
   steeringWheelCar @48 :Bool;
+  conditionalOverridden @49 :UInt8;
 
   struct WheelSpeeds {
     # optional wheel speeds
@@ -499,6 +500,7 @@ struct CarParams {
   experimentalPersonalTune @73 :Bool;
   personalTune @74 :Bool;
   experimentalModeViaWheel @75 :Bool;
+  conditionalExperimentalMode @76 :Bool;
 
   struct SafetyConfig {
     safetyModel @0 :SafetyModel;

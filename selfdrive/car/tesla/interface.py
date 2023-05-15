@@ -51,7 +51,7 @@ class CarInterface(CarInterfaceBase):
 
     return ret
 
-  def _update(self, c, adjustable_follow, experimental_mode_via_wheel):
+  def _update(self, c, adjustable_follow, conditional_experimental_mode, experimental_mode_via_wheel):
     ret = self.CS.update(self.cp, self.cp_cam)
 
     ret.events = self.create_common_events(ret).to_msg()

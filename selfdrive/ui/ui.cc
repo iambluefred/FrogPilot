@@ -222,6 +222,7 @@ static void update_state(UIState *s) {
     scene.longitudinal_control = sm["carParams"].getCarParams().getOpenpilotLongitudinalControl();
     if (scene.longitudinal_control) {
       scene.adjustable_follow_distance = sm["carParams"].getCarParams().getAdjustableFollow();
+      scene.conditional_experimental = sm["carParams"].getCarParams().getConditionalExperimentalMode();
       scene.experimental_mode_via_wheel = sm["carParams"].getCarParams().getExperimentalModeViaWheel();
     }
   }
@@ -235,6 +236,9 @@ static void update_state(UIState *s) {
       scene.blindspot_right = sm["carState"].getCarState().getRightBlindspot();
       scene.turn_signal_left = sm["carState"].getCarState().getLeftBlinker();
       scene.turn_signal_right = sm["carState"].getCarState().getRightBlinker();
+    }
+    if (scene.conditional_experimental && scene.steering_wheel_car) {
+      scene.conditional_overridden = (int)sm["carState"].getCarState().getConditionalOverridden();
     }
     if (scene.rotating_wheel) {
       scene.steering_angle_deg = (int)sm["carState"].getCarState().getSteeringAngleDeg();
@@ -280,8 +284,18 @@ void ui_live_update_params(UIState *s) {
   UIScene &scene = s->scene;
   // FrogPilot variables that need to be updated live
   scene.adjustable_follow_distance_profile = params.getInt("AdjustableFollowDistanceProfile");
+  if (scene.conditional_experimental) {
+    scene.conditional_status = params.getInt("ConditionalStatus");
+    if (scene.experimental_mode_via_wheel && !scene.steering_wheel_car) {
+      scene.experimental_mode_override = params.getInt("ExperimentalModeOverride");
+    }
+  }
   // FrogPilot variables that need to be updated whenever the user changes its toggle value
   if (params.getBool("FrogPilotTogglesUpdated")) {
+    if (scene.conditional_experimental) {
+      scene.conditional_speed = params.getInt("ConditionalExperimentalModeSpeed");
+      scene.conditional_speed_lead = params.getInt("ConditionalExperimentalModeSpeedLead");
+    }
     scene.screen_brightness = params.getInt("ScreenBrightness");
     scene.steering_wheel = params.getInt("SteeringWheel");
   }

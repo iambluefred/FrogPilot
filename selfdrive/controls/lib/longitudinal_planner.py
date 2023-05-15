@@ -6,8 +6,10 @@ from common.numpy_fast import clip, interp
 import cereal.messaging as messaging
 from common.conversions import Conversions as CV
 from common.filter_simple import FirstOrderFilter
+from common.params import Params
 from common.realtime import DT_MDL
 from selfdrive.modeld.constants import T_IDXS
+from selfdrive.controls.lib.lateral_planner import TRAJECTORY_SIZE
 from selfdrive.controls.lib.longcontrol import LongCtrlState
 from selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import LongitudinalMpc, MIN_ACCEL, MAX_ACCEL
 from selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import T_IDXS as T_IDXS_MPC
@@ -26,6 +28,12 @@ A_CRUISE_MAX_BP = [0., 10.0, 25., 40.]
 _A_TOTAL_MAX_V = [1.7, 3.2]
 _A_TOTAL_MAX_BP = [20., 40.]
 
+# Time threshold for Conditional Experimental Mode (Code runs at 20hz, so: THRESHOLD / 20 = seconds)
+THRESHOLD = 5 # 0.25s
+
+# Lookup table for stop sign / stop light detection. Credit goes to the DragonPilot team!
+STOP_SIGN_BREAKING_POINT = [0., 10., 20., 30., 40., 50., 55.]
+STOP_SIGN_DISTANCE = [10, 30., 50., 70., 80., 90., 120.]
 
 def get_min_accel_personal_tune(v_ego):
   return interp(v_ego, A_CRUISE_MIN_BP_PERSONAL_TUNE, A_CRUISE_MIN_VALS_PERSONAL_TUNE)
@@ -68,6 +76,23 @@ class LongitudinalPlanner:
 
     # FrogPilot variables
     self.personal_tune = self.CP.personalTune
+    # Set variables for Conditional Experimental Mode
+    self.params = Params()
+    self.conditional_experimental_mode = self.CP.conditionalExperimentalMode
+    self.experimental_mode_via_wheel = self.CP.experimentalModeViaWheel
+    self.curves = self.params.get_bool("ConditionalExperimentalModeCurves")
+    self.curves_lead = self.params.get_bool("ConditionalExperimentalModeCurvesLead")
+    self.limit = self.params.get_int("ConditionalExperimentalModeSpeed") * CV.MPH_TO_MS
+    self.limit_lead = self.params.get_int("ConditionalExperimentalModeSpeedLead") * CV.MPH_TO_MS
+    self.signal = self.params.get_bool("ConditionalExperimentalModeSignal")
+    self.stop_lights = self.params.get_bool("ConditionalExperimentalModeStopLights")
+    self.curve = False
+    self.lead_status_count = 0
+    self.limits_checked = True
+    self.new_experimental_mode = False
+    self.previous_lead_status = False
+    self.previous_status_value = 0
+    self.stop_light_count = 0
 
   @staticmethod
   def parse_model(model_msg, model_error):
@@ -89,6 +114,7 @@ class LongitudinalPlanner:
     self.mpc.mode = 'blended' if sm['controlsState'].experimentalMode else 'acc'
 
     v_ego = sm['carState'].vEgo
+    v_ego_kph = v_ego * 3.6
     v_cruise_kph = sm['controlsState'].vCruise
     v_cruise_kph = min(v_cruise_kph, V_CRUISE_MAX)
     v_cruise = v_cruise_kph * CV.KPH_TO_MS
@@ -148,6 +174,95 @@ class LongitudinalPlanner:
     a_prev = self.a_desired
     self.a_desired = float(interp(DT_MDL, T_IDXS[:CONTROL_N], self.a_desired_trajectory))
     self.v_desired_filter.x = self.v_desired_filter.x + DT_MDL * (self.a_desired + a_prev) / 2.0
+        
+    # Lead detection
+    def detect_lead(radarstate):
+      lead_status = radarstate.leadOne.status
+      self.lead_status_count = (self.lead_status_count + 1) if lead_status == self.previous_lead_status else 0
+      self.previous_lead_status = lead_status
+      # If lead is detected for > 0.25s
+      has_lead = self.lead_status_count >= THRESHOLD and lead_status
+      return has_lead
+
+    # Determine the road curvature - Credit goes to to Pfeiferj!
+    def road_curvature(lead, modeldata, standstill):
+      # Check if there's no lead vehicle if necessary
+      if not (self.curves_lead and lead) and not standstill:
+        predicted_lateral_accelerations = np.abs(np.array(modeldata.acceleration.y))
+        predicted_velocities = np.array(modeldata.velocity.x)
+        # Check if the number of predicted lateral accelerations and velocities are as expected
+        if len(predicted_lateral_accelerations) != 0 and len(predicted_lateral_accelerations) == len(predicted_velocities):
+          curvature_ratios = predicted_lateral_accelerations / (predicted_velocities ** 2)
+          predicted_lateral_accelerations = curvature_ratios * (v_ego ** 2)
+          # Return max lateral accelerations
+          curvature = np.amax(predicted_lateral_accelerations)
+          return curvature >= 1.6 or (self.curve and curvature > 1.1)
+      return False
+      
+    # Stop sign and stop light detection - Credit goes to the DragonPilot team!
+    def stop_sign_and_light(carstate, lead, modeldata, standstill):
+      if abs(carstate.steeringAngleDeg) <= 60 and not standstill and self.stop_lights:
+        if len(modeldata.orientation.x) == len(modeldata.position.x) == TRAJECTORY_SIZE:
+          if modeldata.position.x[TRAJECTORY_SIZE - 1] < interp(v_ego_kph, STOP_SIGN_BREAKING_POINT, STOP_SIGN_DISTANCE):
+            self.stop_light_count += 1
+          else:
+            self.stop_light_count = 0
+        else:
+            self.stop_light_count = 0
+      else:
+        self.stop_light_count = 0
+      # Check if stop sign / stop light is detected for > 0.25s
+      return self.stop_light_count >= THRESHOLD
+
+    # Conditional Experimental Mode
+    def conditional_experimental_mode():
+      # Retrieve the required driving conditions
+      carstate, modeldata, radarstate = (sm[key] for key in ['carState', 'modelV2', 'radarState'])
+      lead = detect_lead(radarstate)
+      experimental_mode = self.mpc.mode == 'blended'
+      standstill = carstate.standstill
+
+      # Set the value of "overridden"
+      if self.experimental_mode_via_wheel:
+        if carstate.steeringWheelCar:
+          overridden = carstate.conditionalOverridden
+        else:
+          overridden = self.params.get_int("ExperimentalModeOverride")
+      else:
+        overridden = 0
+
+      # Only check and update the limits once
+      if not self.limits_checked:
+        self.limit = self.params.get_int("ConditionalExperimentalModeSpeed") * CV.MPH_TO_MS
+        self.limit_lead = self.params.get_int("ConditionalExperimentalModeSpeed") * CV.MPH_TO_MS
+        self.limits_checked = True
+
+      # Update conditions
+      self.curve = road_curvature(lead, modeldata, standstill)
+      # If either turn signal is on and the car is driving < 55 mph
+      signal = self.signal and v_ego < 25 and (carstate.leftBlinker or carstate.rightBlinker)
+      speed = (self.limit != 0 and not lead and v_ego < self.limit) or (self.limit_lead != 0 and lead and v_ego < self.limit_lead)
+      stop_light_detected = stop_sign_and_light(carstate, lead, modeldata, standstill)
+      conditions_met = self.curve or signal or speed or stop_light_detected
+
+      # Update Experimental Mode based on the current driving conditions
+      if (not experimental_mode and conditions_met and overridden != 1) or overridden == 2:
+        self.new_experimental_mode = True
+      elif (experimental_mode and not conditions_met and not standstill and overridden != 2) or overridden == 1:
+        # Check the speed limits just in case the user changed either of their values mid drive
+        self.limits_checked = False
+        self.new_experimental_mode = False
+
+      # Set parameter for on-road status bar
+      status_value = 1 if overridden == 1 and not carstate.steeringWheelCar else 2 if overridden == 2 and not carstate.steeringWheelCar else 3 if signal else 4 if stop_light_detected else 5 if self.curve else 6 if speed and not lead else 7 if speed else 0
+      # Update status value if it has changed
+      if status_value != self.previous_status_value:
+        self.params.put_int("ConditionalStatus", status_value)
+        self.previous_status_value = status_value
+
+    # Only run the function if Conditional Experimental Mode is on
+    if self.conditional_experimental_mode:
+      conditional_experimental_mode()
 
   def publish(self, sm, pm):
     plan_send = messaging.new_message('longitudinalPlan')
@@ -167,5 +282,7 @@ class LongitudinalPlanner:
     longitudinalPlan.fcw = self.fcw
 
     longitudinalPlan.solverExecutionTime = self.mpc.solve_time
+
+    longitudinalPlan.conditionalExperimentalMode = self.new_experimental_mode
 
     pm.send('longitudinalPlan', plan_send)

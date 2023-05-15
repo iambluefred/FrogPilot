@@ -16,6 +16,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"AdjustableFollowDistance", "Adjustable Follow Distance", "Enable FrogPilot's follow distance profiles using the 'Distance' button on the steering wheel (Toyota/Lexus Only) or via the onroad UI for other makes.\n\n1 bar = Aggressive\n2 bars = Comfort\n3 bars = Relaxed", "../assets/offroad/icon_distance.png"},
     {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"},
     {"Compass", "Compass", "Compass that rotates according to your driving direction.", "../assets/offroad/icon_compass.png"},
+    {"ConditionalExperimentalMode", "Conditional Experimental Mode", "Automatically activate 'Experimental Mode' based on specified conditions.", "../assets/offroad/icon_conditional.png"},
     {"CustomRoadUI", "Custom Road UI", "Customize the road UI to your liking.", "../assets/offroad/icon_road.png"},
     {"DeviceShutdownTimer", "Device Shutdown Timer", "Set the timer for when the device turns off after being offroad to reduce energy waste and prevent battery drain.", "../assets/offroad/icon_time.png"},
     {"DisableAd", "Disable comma prime Ad", "Hides the comma prime ad.", "../assets/offroad/icon_minus.png"},
@@ -40,6 +41,16 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
         {"FrogIcons", "FrogPilot Icons", "Replace stock openpilot icons with FrogPilot's."},
         {"FrogSignals", "FrogPilot Signals", "Add a turn signal animation of a frog hopping across the screen."},
         {"FrogSounds", "FrogPilot Sounds", "Replace stock openpilot sounds with FrogPilot's."}
+      });
+    } else if (key == "ConditionalExperimentalMode") {
+      createSubControl(key, label, desc, icon, {
+        new ConditionalExperimentalModeSpeed(),
+        new ConditionalExperimentalModeSpeedLead(),
+      }, {
+        {"ConditionalExperimentalModeStopLights", "Experimental Mode For Stop Signs/Lights", "Activate 'Experimental Mode' whenever a stop sign or stop light is detected."},
+        {"ConditionalExperimentalModeCurves", "Experimental Mode On Curves", "Activate 'Experimental Mode' for curves."},
+        {"ConditionalExperimentalModeCurvesLead", "   Don't Activate On Curves With Lead", "Don't activate 'Experimental Mode' on curves with a lead vehicle."},
+        {"ConditionalExperimentalModeSignal", "Experimental Mode With Turn Signal", "Activate 'Experimental Mode' whenever the turn signal is on to take turns."}
       });
     } else if (key == "CustomRoadUI") {
       createSubControl(key, label, desc, icon, {

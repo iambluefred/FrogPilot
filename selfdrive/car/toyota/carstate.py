@@ -35,9 +35,10 @@ class CarState(CarStateBase):
     self.params = Params()
     self.distance_btn = 0
     self.lkas_previously_pressed = False
+    self.previous_override_value = 0
     self.steeringWheelCarSet = False
 
-  def update(self, cp, cp_cam, adjustable_follow, experimental_mode_via_wheel):
+  def update(self, cp, cp_cam, adjustable_follow, conditional_experimental_mode, experimental_mode_via_wheel):
     ret = car.CarState.new_message()
 
     ret.doorOpen = any([cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FL"], cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FR"],
@@ -155,8 +156,14 @@ class CarState(CarStateBase):
     lkas_pressed = cp_cam.vl["LKAS_HUD"]["LKAS_STATUS"] == 1 if experimental_mode_via_wheel else False
     if lkas_pressed and not self.lkas_previously_pressed and ret.cruiseState.available:
       experimental_mode = self.params.get_bool("ExperimentalMode")
-      # Invert the value of "ExperimentalMode"
-      self.params.put_bool("ExperimentalMode", not experimental_mode)
+      if conditional_experimental_mode:
+        # Set "conditionalOverridden" to work with "Conditional Experimental Mode"
+        override_value = 0 if self.previous_override_value >= 1 else 1 if experimental_mode else 2
+        self.previous_override_value = override_value
+      else:
+        # Invert the value of "ExperimentalMode"
+        self.params.put_bool("ExperimentalMode", not experimental_mode)
+    ret.conditionalOverridden = self.previous_override_value
     self.lkas_previously_pressed = lkas_pressed
     
     # Disable the onroad widgets since they're not needed
