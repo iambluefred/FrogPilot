@@ -215,6 +215,10 @@ struct CarState {
 
   fuelGauge @41 :Float32; # battery or fuel tank level from 0.0 to 1.0
   charging @43 :Bool;
+  
+  # FrogPilot CarStates
+  adjustableFollowCar @46 :Bool;
+  distanceLines @47 :UInt8;
 
   struct WheelSpeeds {
     # optional wheel speeds
@@ -488,6 +492,9 @@ struct CarParams {
   networkLocation @50 :NetworkLocation;  # Where Panda/C2 is integrated into the car's CAN network
 
   wheelSpeedFactor @63 :Float32; # Multiplier on wheels speeds to computer actual speeds
+
+  # FrogPilot CarParams
+  adjustableFollow @72 :Bool;
 
   struct SafetyConfig {
     safetyModel @0 :SafetyModel;

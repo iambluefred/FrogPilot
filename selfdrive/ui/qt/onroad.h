@@ -69,6 +69,8 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(int status MEMBER status);
 
   // FrogPilot properties
+  Q_PROPERTY(bool adjustableFollowDistance MEMBER adjustableFollowDistance);
+  Q_PROPERTY(bool adjustableFollowDistanceCar MEMBER adjustableFollowDistanceCar);
   Q_PROPERTY(bool blindspotLeft MEMBER blindspotLeft);
   Q_PROPERTY(bool blindspotRight MEMBER blindspotRight);
   Q_PROPERTY(bool compass MEMBER compass);
@@ -79,6 +81,7 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(bool rotatingWheel MEMBER rotatingWheel);
   Q_PROPERTY(bool turnSignalLeft MEMBER turnSignalLeft);
   Q_PROPERTY(bool turnSignalRight MEMBER turnSignalRight);
+  Q_PROPERTY(int adjustableFollowDistanceProfile MEMBER adjustableFollowDistanceProfile);
   Q_PROPERTY(int bearingDeg MEMBER bearingDeg);
   Q_PROPERTY(int steeringAngleDeg MEMBER steeringAngleDeg);
   Q_PROPERTY(int steeringWheel MEMBER steeringWheel);
@@ -92,6 +95,7 @@ private:
   void drawText(QPainter &p, int x, int y, const QString &text, int alpha = 255);
   
   // FrogPilot widgets
+  void drawAdjustableFollowDistance(QPainter &p);
   void drawCompass(QPainter &p);
   void drawFrogSignals(QPainter &p);
   void drawIconRotate(QPainter &p, int x, int y);
@@ -118,6 +122,8 @@ private:
   bool wide_cam_requested = false;
 
   // FrogPilot variables
+  bool adjustableFollowDistance;
+  bool adjustableFollowDistanceCar;
   bool blindspotLeft;
   bool blindspotRight;
   bool compass;
@@ -128,6 +134,7 @@ private:
   bool rotatingWheel;
   bool turnSignalLeft;
   bool turnSignalRight;
+  int adjustableFollowDistanceProfile;
   int animationFrameIndex;
   int bearingDeg;
   int steeringAngleDeg;
@@ -135,6 +142,7 @@ private:
   QPixmap compass_inner_img;
   QPixmap engage_img;
   QPixmap experimental_img;
+  QVector<std::pair<QPixmap, QString>> profile_data;
   static constexpr int totalFrames = 8;
   std::map<int, QPixmap> wheel_images;
   std::vector<QPixmap> signalImgVector;

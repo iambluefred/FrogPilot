@@ -7,6 +7,7 @@
 #include <QDebug>
 
 #include <QTimer>
+#include <QElapsedTimer>
 
 #include "common/timing.h"
 #include "selfdrive/ui/qt/util.h"
@@ -86,8 +87,40 @@ void OnroadWindow::mousePressEvent(QMouseEvent* e) {
     bool sidebarVisible = geometry().x() > 0;
     map->setVisible(!sidebarVisible && !map->isVisible());
   }
+
+  // FrogPilot clickable widgets
+  const auto &scene = uiState()->scene;
+  static auto params = Params();
+  static bool propagateEvent = true;
+  static bool recentlyTapped = false;
+  const bool isAdjustableFollow = scene.adjustable_follow_distance && !scene.adjustable_follow_distance_car;
+  const int x_offset = scene.mute_dm ? 50 : 250;
+  const SubMaster &sm = *uiState()->sm;
+  static bool rightHandDM = false;
+
+  // Update at 2Hz
+  if (sm.frame % (UI_FREQ / 2) == 0) {
+    rightHandDM = sm["driverMonitoringState"].getDriverMonitoringState().getIsRHD();
+  }
+
+  // Adjustable follow distance button
+  int x = rightHandDM ? rect().right() - (btn_size - 24) / 2 - (bdr_s * 2) - x_offset : (btn_size - 24) / 2 + (bdr_s * 2) + x_offset;
+  const int y = rect().bottom() - footer_h / 2;
+  QPoint adjustableFollowDistanceCenter(x, y);
+  // Give the button a 25% offset so it doesn't need to be clicked on perfectly
+  constexpr int adjustableFollowDistanceRadius = btn_size * 1.25;
+  bool isAdjustableFollowDistanceClicked = (e->pos() - adjustableFollowDistanceCenter).manhattanLength() <= adjustableFollowDistanceRadius;
+
+  // Check if the button was clicked and if adjustableFollowDistances is toggled on
+  if (isAdjustableFollowDistanceClicked && isAdjustableFollow) {
+    params.putInt("AdjustableFollowDistanceProfile", (scene.adjustable_follow_distance_profile % 3) + 1);
+    propagateEvent = false;
+  }
+
   // propagation event to parent(HomeWindow)
-  QWidget::mousePressEvent(e);
+  if (propagateEvent) {
+    QWidget::mousePressEvent(e);
+  }
 }
 
 void OnroadWindow::offroadTransition(bool offroad) {
@@ -267,6 +300,13 @@ AnnotatedCameraWidget::AnnotatedCameraWidget(VisionStreamType type, QWidget* par
     {3, loadPixmap("../assets/frog.png", {img_size, img_size})},
     {4, loadPixmap("../assets/rocket.png", {img_size, img_size})}
   };
+  
+  // Following distance profiles
+  profile_data = {
+    {QPixmap("../assets/aggressive.png"), "Aggressive"},
+    {QPixmap("../assets/comfort.png"), "Comfort"},
+    {QPixmap("../assets/relaxed.png"), "Relaxed"}
+  };
 
   // Turn signal images
   const QStringList imagePaths = {
@@ -349,6 +389,9 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
   dm_fade_state = fmax(0.0, fmin(1.0, dm_fade_state+0.2*(0.5-(float)(dmActive))));
 
   // FrogPilot properties
+  setProperty("adjustableFollowDistance", s.scene.adjustable_follow_distance);
+  setProperty("adjustableFollowDistanceCar", s.scene.adjustable_follow_distance_car);
+  setProperty("adjustableFollowDistanceProfile", s.scene.adjustable_follow_distance_profile);
   setProperty("bearingDeg", s.scene.bearing_deg);
   setProperty("blindspotLeft", s.scene.blindspot_left);
   setProperty("blindspotRight", s.scene.blindspot_right);
@@ -526,6 +569,11 @@ void AnnotatedCameraWidget::drawHud(QPainter &p) {
   // Animated turn signals
   if (frogSignals) {
     drawFrogSignals(p);
+  }
+
+  // Adjustable following distance button - Hide the button when the turn signal animation is on
+  if (adjustableFollowDistance && !adjustableFollowDistanceCar && (!frogSignals || (frogSignals && !turnSignalLeft && !turnSignalRight))) {
+    drawAdjustableFollowDistance(p);
   }
 }
 
@@ -1001,5 +1049,60 @@ void AnnotatedCameraWidget::drawFrogSignals(QPainter &p) {
     // Display the animation based on which signal is activated
     drawSignal(turnSignalLeft, leftSignalXPosition, false, blindspotLeft);
     drawSignal(turnSignalRight, rightSignalXPosition, true, blindspotRight);
+  }
+}
+
+void AnnotatedCameraWidget::drawAdjustableFollowDistance(QPainter &p) {
+  // Declare the variables
+  static QElapsedTimer timer;
+  static bool displayText = true;
+  static int lastProfile = -1;
+  constexpr int fadeDuration = 1000; // 1 second
+  constexpr int textDuration = 3000; // 3 seconds
+  
+  // Enable Antialiasing
+  p.setRenderHint(QPainter::Antialiasing);
+
+  // Set the x and y coordinates
+  int x = rightHandDM ? rect().right() - (btn_size - 24) / 2 - (bdr_s * 2) - (muteDM ? 50 : 250) : (btn_size - 24) / 2 + (bdr_s * 2) + (muteDM ? 50 : 250);
+  const int y = rect().bottom() - footer_h / 2;
+
+  // Select the appropriate profile image/text
+  int index = qBound(0, adjustableFollowDistanceProfile - 1, 2);
+  QPixmap& profile_image = profile_data[index].first;
+  QString profile_text = profile_data[index].second;
+
+  // Set "displayText" to "true" when the user changes profiles
+  if (lastProfile != adjustableFollowDistanceProfile) {
+    displayText = true;
+    lastProfile = adjustableFollowDistanceProfile;
+    timer.restart();
+  }
+
+  // Set the text display
+  displayText = !timer.hasExpired(textDuration);
+
+  // Set the elapsed time since the profile switch
+  int elapsed = timer.elapsed();
+
+  // Calculate the opacity for the text and image based on the elapsed time
+  qreal textOpacity = qBound(0.0, (1.0 - static_cast<qreal>(elapsed - textDuration) / fadeDuration), 1.0);
+  qreal imageOpacity = qBound(0.0, (static_cast<qreal>(elapsed - textDuration) / fadeDuration), 1.0);
+
+  // Draw the profile text with the calculated opacity
+  if (textOpacity > 0.0) {
+    configFont(p, "Inter", 50, "Bold");
+    p.setPen(QColor(255, 255, 255));
+    // Calculate the center position for text
+    QFontMetrics fontMetrics(p.font());
+    int textWidth = fontMetrics.horizontalAdvance(profile_text);
+    // Apply opacity to the text
+    p.setOpacity(textOpacity);
+    p.drawText(x - textWidth / 2, y + fontMetrics.height() / 2, profile_text);
+  }
+
+  // Draw the profile image with the calculated opacity
+  if (imageOpacity > 0.0) {
+    drawIcon(p, x, y, profile_image, blackColor(0), imageOpacity);
   }
 }

@@ -30,7 +30,10 @@ class CarState(CarStateBase):
     self.acc_type = 1
     self.lkas_hud = {}
 
-  def update(self, cp, cp_cam):
+    # FrogPilot variables
+    self.distance_btn = 0
+
+  def update(self, cp, cp_cam, adjustable_follow):
     ret = car.CarState.new_message()
 
     ret.doorOpen = any([cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FL"], cp.vl["BODY_CONTROL_STATE"]["DOOR_OPEN_FR"],
@@ -133,6 +136,19 @@ class CarState(CarStateBase):
       ret.cruiseState.standstill = self.pcm_acc_status == 7
     ret.cruiseState.enabled = bool(cp.vl["PCM_CRUISE"]["CRUISE_ACTIVE"])
     ret.cruiseState.nonAdaptive = cp.vl["PCM_CRUISE"]["CRUISE_STATE"] in (1, 2, 3, 4, 5, 6)
+
+    # Adjustable follow distance function
+    if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) and adjustable_follow:
+      # KRKeegan - Add support for toyota distance button
+      self.distance_btn = 1 if cp_cam.vl["ACC_CONTROL"]["DISTANCE"] == 1 else 0
+      ret.distanceLines = cp.vl["PCM_CRUISE_SM"]["DISTANCE_LINES"]
+    if self.CP.carFingerprint in RADAR_ACC_CAR and adjustable_follow:
+      # These cars have the acc_control on car can
+      self.distance_btn = 1 if cp.vl["ACC_CONTROL"]["DISTANCE"] == 1 else 0
+      ret.distanceLines = cp.vl["PCM_CRUISE_SM"]["DISTANCE_LINES"]
+    
+    # Disable the onroad widgets since they're not needed
+    ret.adjustableFollowCar = any(self.CP.carFingerprint in car for car in (TSS2_CAR, RADAR_ACC_CAR))
 
     ret.genericToggle = bool(cp.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
     ret.espDisabled = cp.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
@@ -250,6 +266,8 @@ class CarState(CarStateBase):
         ("ACC_HUD", 1),
       ]
 
+      signals.append(("DISTANCE", "ACC_CONTROL", 0))
+
     if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu:
       signals += [
         ("FORCE", "PRE_COLLISION"),
@@ -258,6 +276,9 @@ class CarState(CarStateBase):
       checks += [
         ("PRE_COLLISION", 33),
       ]
+
+    if CP.carFingerprint in (TSS2_CAR | RADAR_ACC_CAR):
+      signals.append(("DISTANCE_LINES", "PCM_CRUISE_SM"))
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 0)
 
@@ -290,5 +311,7 @@ class CarState(CarStateBase):
         ("ACC_CONTROL", 33),
         ("ACC_HUD", 1),
       ]
+
+      signals.append(("DISTANCE", "ACC_CONTROL", 0))
 
     return CANParser(DBC[CP.carFingerprint]["pt"], signals, checks, 2)

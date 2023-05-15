@@ -87,6 +87,7 @@ class CarInterfaceBase(ABC):
 
     # FrogPilot variables
     params = Params()
+    self.adjustable_follow = self.CP.adjustableFollow
     fire_the_babysitter = params.get_bool("FireTheBabysitter")
     self.mute_door = fire_the_babysitter and params.get_bool("MuteDoor")
     self.mute_seatbelt = fire_the_babysitter and params.get_bool("MuteSeatbelt")
@@ -183,6 +184,10 @@ class CarInterfaceBase(ABC):
     ret.longitudinalActuatorDelayLowerBound = 0.15
     ret.longitudinalActuatorDelayUpperBound = 0.15
     ret.steerLimitTimer = 1.0
+    
+    # FrogPilot variables
+    params = Params()
+    ret.adjustableFollow = params.get_bool("AdjustableFollowDistance")
     return ret
 
   @staticmethod
@@ -210,7 +215,7 @@ class CarInterfaceBase(ABC):
         cp.update_strings(can_strings)
 
     # get CarState
-    ret = self._update(c)
+    ret = self._update(c, self.adjustable_follow)
 
     ret.canValid = all(cp.can_valid for cp in self.can_parsers if cp is not None)
     ret.canTimeout = any(cp.bus_timeout for cp in self.can_parsers if cp is not None)
