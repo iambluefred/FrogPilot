@@ -234,7 +234,7 @@ class LongitudinalPlanner:
       # Only check and update the limits once
       if not self.limits_checked:
         self.limit = self.params.get_int("ConditionalExperimentalModeSpeed") * CV.MPH_TO_MS
-        self.limit_lead = self.params.get_int("ConditionalExperimentalModeSpeed") * CV.MPH_TO_MS
+        self.limit_lead = self.params.get_int("ConditionalExperimentalModeSpeedLead") * CV.MPH_TO_MS
         self.limits_checked = True
 
       # Update conditions
