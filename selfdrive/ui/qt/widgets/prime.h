@@ -76,6 +76,9 @@ private:
   QStackedWidget *mainLayout;
   PrimeAdWidget *primeAd;
   PrimeUserWidget *primeUser;
+  
+  // FrogPilot variables
+  bool isDisableAd;
 
 private slots:
   void replyFinished(const QString &response, bool success);

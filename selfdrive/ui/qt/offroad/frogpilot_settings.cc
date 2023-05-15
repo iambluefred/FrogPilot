@@ -15,6 +15,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"FrogTheme", "FrogPilot Theme", "Enable the beloved FrogPilot Theme! Disable toggle to revert back to the stock openpilot theme.", "../assets/images/frog_button_home.png"},
     {"BackButton", "'Back' Button", "Replace the 'X' button in the settings menu with a cleaner looking 'Back' button.", "../assets/offroad/icon_back.png"},
     {"DeviceShutdownTimer", "Device Shutdown Timer", "Set the timer for when the device turns off after being offroad to reduce energy waste and prevent battery drain.", "../assets/offroad/icon_time.png"},
+    {"DisableAd", "Disable comma prime Ad", "Hides the comma prime ad.", "../assets/offroad/icon_minus.png"},
     {"DisableInternetCheck", "Disable Internet Check", "Allows the device to remain offline indefinitely.", "../assets/offroad/icon_warning.png"},
     {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"},
     {"ScreenBrightness", "Screen Brightness", "Choose a custom screen brightness level or use the default 'Auto' brightness setting.", "../assets/offroad/icon_light.png"}

@@ -11,6 +11,7 @@
 
 #include <QrCode.hpp>
 
+#include "common/params.h"
 #include "selfdrive/ui/qt/request_repeater.h"
 #include "selfdrive/ui/qt/util.h"
 #include "selfdrive/ui/qt/qt_window.h"
@@ -299,6 +300,10 @@ SetupWidget::SetupWidget(QWidget* parent) : QFrame(parent) {
 
     QObject::connect(repeater, &RequestRepeater::requestDone, this, &SetupWidget::replyFinished);
   }
+
+  // FrogPilot variables
+  static auto params = Params();
+  isDisableAd = params.getBool("DisableAd");
 }
 
 void SetupWidget::replyFinished(const QString &response, bool success) {
@@ -319,7 +324,7 @@ void SetupWidget::replyFinished(const QString &response, bool success) {
   } else {
     popup->reject();
 
-    if (prime_type) {
+    if (prime_type or isDisableAd) {
       mainLayout->setCurrentWidget(primeUser);
     } else {
       mainLayout->setCurrentWidget(primeAd);
