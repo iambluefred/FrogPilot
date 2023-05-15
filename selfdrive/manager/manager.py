@@ -38,6 +38,10 @@ def manager_init() -> None:
   default_params: List[Tuple[str, Union[str, bytes]]] = [
     ("CompletedTrainingVersion", "0"),
     ("DisengageOnAccelerator", "0"),
+    ("FrogColors", "1"),
+    ("FrogIcons", "1"),
+    ("FrogSounds", "1"),
+    ("FrogTheme", "1"),
     ("GsmMetered", "1"),
     ("HasAcceptedTerms", "0"),
     ("IsLdwEnabled", "1"),

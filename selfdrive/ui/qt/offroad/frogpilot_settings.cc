@@ -12,12 +12,16 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
   mainLayout = new QVBoxLayout(this);
 
   const std::vector<std::tuple<QString, QString, QString, QString>> toggles = {
+    {"FrogTheme", "FrogPilot Theme", "Enable the beloved FrogPilot Theme! Disable toggle to revert back to the stock openpilot theme.", "../assets/images/frog_button_home.png"}
   };
 
   for (int i = 0; i < toggles.size(); i++) {
     const auto &[key, label, desc, icon] = toggles[i];
-    if (key == "") {
+    if (key == "FrogTheme") {
       createSubControl(key, label, desc, icon, {}, {
+        {"FrogColors", "FrogPilot Colors", "Replace stock openpilot colors with FrogPilot's."},
+        {"FrogIcons", "FrogPilot Icons", "Replace stock openpilot icons with FrogPilot's."},
+        {"FrogSounds", "FrogPilot Sounds", "Replace stock openpilot sounds with FrogPilot's."}
       });
     } else {
       mainLayout->addWidget(createParamControl(key, label, desc, icon, parent));

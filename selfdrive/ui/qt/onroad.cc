@@ -292,6 +292,7 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
 
   // FrogPilot properties
   setProperty("experimentalMode", s.scene.experimental_mode);
+  setProperty("frogColors", s.scene.frog_colors);
 }
 
 void AnnotatedCameraWidget::drawHud(QPainter &p) {
@@ -503,19 +504,19 @@ void AnnotatedCameraWidget::drawLaneLines(QPainter &painter, const UIState *s) {
 
   // lanelines
   for (int i = 0; i < std::size(scene.lane_line_vertices); ++i) {
-    painter.setBrush(QColor::fromRgbF(1.0, 1.0, 1.0, std::clamp<float>(scene.lane_line_probs[i], 0.0, 0.7)));
+    painter.setBrush(frogColors ? QColor(0x17, 0x86, 0x44, 0xf1) : QColor::fromRgbF(1.0, 1.0, 1.0, std::clamp<float>(scene.lane_line_probs[i], 0.0, 0.7)));
     painter.drawPolygon(scene.lane_line_vertices[i]);
   }
 
   // road edges
   for (int i = 0; i < std::size(scene.road_edge_vertices); ++i) {
-    painter.setBrush(QColor::fromRgbF(1.0, 0, 0, std::clamp<float>(1.0 - scene.road_edge_stds[i], 0.0, 1.0)));
+    painter.setBrush(frogColors ? QColor(0x17, 0x86, 0x44, 0xf1) : QColor::fromRgbF(1.0, 0, 0, std::clamp<float>(1.0 - scene.road_edge_stds[i], 0.0, 1.0)));
     painter.drawPolygon(scene.road_edge_vertices[i]);
   }
 
   // paint path
   QLinearGradient bg(0, height(), 0, 0);
-  if (experimentalMode) {
+  if (experimentalMode || frogColors) {
     // The first half of track_vertices are the points for the right side of the path
     // and the indices match the positions of accel from uiPlan
     const auto &acceleration = sm["uiPlan"].getUiPlan().getAccel();
@@ -528,14 +529,29 @@ void AnnotatedCameraWidget::drawLaneLines(QPainter &painter, const UIState *s) {
       // Flip so 0 is bottom of frame
       float lin_grad_point = (height() - scene.track_vertices[i].y()) / height();
 
+    float path_hue, saturation, lightness, alpha;
+
+    if (frogColors) {
+      // Set acceleration to "2.5" to give it a constant green path
+      float accelValue = (-0.25 < acceleration[i] <= 0.25) ? 2.5 : acceleration[i];
+
+      path_hue = fmax(fmin(60 + accelValue * 35, 150), 30);
+      path_hue = int(path_hue * 100 + 0.5) / 100;
+
+      saturation = fmin(fabs(accelValue * 1.5), 1);
+      lightness = util::map_val(saturation, 0.0f, 1.0f, 0.95f, 0.62f);
+      alpha = util::map_val(lin_grad_point, 0.75f / 2.f, 0.75f, 0.4f, 0.0f);
+    } else {
       // speed up: 120, slow down: 0
-      float path_hue = fmax(fmin(60 + acceleration[i] * 35, 120), 0);
+      path_hue = fmax(fmin(60 + acceleration[i] * 35, 120), 0);
       // FIXME: painter.drawPolygon can be slow if hue is not rounded
       path_hue = int(path_hue * 100 + 0.5) / 100;
 
-      float saturation = fmin(fabs(acceleration[i] * 1.5), 1);
-      float lightness = util::map_val(saturation, 0.0f, 1.0f, 0.95f, 0.62f);  // lighter when grey
-      float alpha = util::map_val(lin_grad_point, 0.75f / 2.f, 0.75f, 0.4f, 0.0f);  // matches previous alpha fade
+      saturation = fmin(fabs(acceleration[i] * 1.5), 1);
+      lightness = util::map_val(saturation, 0.0f, 1.0f, 0.95f, 0.62f);  // lighter when grey
+      alpha = util::map_val(lin_grad_point, 0.75f / 2.f, 0.75f, 0.4f, 0.0f);  // matches previous alpha fade
+    }
+
       bg.setColorAt(lin_grad_point, QColor::fromHslF(path_hue / 360., saturation, lightness, alpha));
 
       // Skip a point, unless next is last
@@ -603,8 +619,8 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s)
 void AnnotatedCameraWidget::drawLead(QPainter &painter, const cereal::RadarState::LeadData::Reader &lead_data, const QPointF &vd) {
   painter.save();
 
-  const float speedBuff = 10.;
-  const float leadBuff = 40.;
+  const float speedBuff = frogColors ? 25. : 10.;
+  const float leadBuff = frogColors ? 100. : 40.;
   const float d_rel = lead_data.getDRel();
   const float v_rel = lead_data.getVRel();
 
@@ -630,7 +646,7 @@ void AnnotatedCameraWidget::drawLead(QPainter &painter, const cereal::RadarState
 
   // chevron
   QPointF chevron[] = {{x + (sz * 1.25), y + sz}, {x, y}, {x - (sz * 1.25), y + sz}};
-  painter.setBrush(redColor(fillAlpha));
+  painter.setBrush(frogColors ? frogColor(fillAlpha) : redColor(fillAlpha));
   painter.drawPolygon(chevron, std::size(chevron));
 
   painter.restore();
