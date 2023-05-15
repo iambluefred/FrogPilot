@@ -627,6 +627,30 @@ void AnnotatedCameraWidget::drawLaneLines(QPainter &painter, const UIState *s) {
   painter.setBrush(bg);
   painter.drawPolygon(scene.track_vertices);
 
+  // Create new path with track vertices and track edge vertices
+  QPainterPath path;
+  path.addPolygon(scene.track_vertices);
+  path.addPolygon(scene.track_edge_vertices);
+
+  // Paint path edges
+  QLinearGradient pe(0, height(), 0, height() / 4);
+  if (experimentalMode) {
+    pe.setColorAt(0.0, QColor::fromHslF(25 / 360., 0.71, 0.50, 1.0));
+    pe.setColorAt(0.5, QColor::fromHslF(25 / 360., 0.71, 0.50, 0.5));
+    pe.setColorAt(1.0, QColor::fromHslF(25 / 360., 0.71, 0.50, 0.1));
+  } else if (frogColors) {
+    pe.setColorAt(0.0, QColor::fromHslF(144 / 360., 0.71, 0.31, 1.0));
+    pe.setColorAt(0.5, QColor::fromHslF(144 / 360., 0.71, 0.31, 0.5));
+    pe.setColorAt(1.0, QColor::fromHslF(144 / 360., 0.71, 0.31, 0.1));
+  } else {
+    pe.setColorAt(0.0, QColor::fromHslF(148 / 360., 0.94, 0.51, 1.0));
+    pe.setColorAt(0.5, QColor::fromHslF(112 / 360., 1.0, 0.68, 0.5));
+    pe.setColorAt(1.0, QColor::fromHslF(112 / 360., 1.0, 0.68, 0.1));
+  }
+
+  painter.setBrush(pe);
+  painter.drawPath(path);
+
   painter.restore();
 }
 

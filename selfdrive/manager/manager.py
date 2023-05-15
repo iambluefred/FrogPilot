@@ -38,6 +38,7 @@ def manager_init() -> None:
   default_params: List[Tuple[str, Union[str, bytes]]] = [
     ("BackButton", "1"),
     ("CompletedTrainingVersion", "0"),
+    ("CustomRoadUI", "1"),
     ("DeviceShutdownTimer", "6"),
     ("DisableInternetCheck", "1"),
     ("DisableAd", "1"),
@@ -51,6 +52,7 @@ def manager_init() -> None:
     ("HasAcceptedTerms", "0"),
     ("IsLdwEnabled", "1"),
     ("LaneDetection", "1"),
+    ("LaneLinesWidth", "4"),
     ("LanguageSetting", "main_en"),
     ("MuteDM", "1"),
     ("MuteDoor", "1"),
@@ -60,10 +62,14 @@ def manager_init() -> None:
     ("NumericalTemp", "1"),
     ("OneLaneChange", "1"),
     ("OpenpilotEnabledToggle", "1"),
+    ("PathEdgeWidth", "20"),
+    ("PathWidth", "61"),
+    ("RoadEdgesWidth", "2"),
     ("RotatingWheel", "1"),
     ("ScreenBrightness", "100"),
     ("Sidebar", "1"),
     ("SteeringWheel", "1"),
+    ("UnlimitedLength", "1"),
     ("WideCameraDisable", "1"),
   ]
   if not PC:

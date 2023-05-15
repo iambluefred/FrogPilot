@@ -101,6 +101,26 @@ ParamControllerInt(DeviceShutdownTimer, "DeviceShutdownTimer", "Device Shutdown 
   return std::clamp(v, 0, 30);
 )
 
+ParamControllerFloat(LaneLinesWidth, "LaneLinesWidth", "   Lane Line Width", "Customize the lane lines width. Default matches the MUTCD average of 4 inches.", "../assets/offroad/icon_blank.png",
+  return QString::number(params.getFloat("LaneLinesWidth")) + " inches";,
+  return std::clamp(v, 0.f, 24.f);
+)
+
+ParamControllerInt(PathEdgeWidth, "PathEdgeWidth", "   Path Edge Width", "Customize the path edge width that displays current driving statuses. Default is 20% of the total path.", "../assets/offroad/icon_blank.png",
+  return QString::number(params.getInt("PathEdgeWidth")) + "%";,
+  return std::clamp(v, 0, 100);
+)
+
+ParamControllerFloat(PathWidth, "PathWidth", "   Path Width", "Customize the path width. Default matches a 2019 Lexus ES 350.", "../assets/offroad/icon_blank.png",
+  return QString::number(params.getFloat("PathWidth") / 10.0) + " feet";,
+  return std::clamp(v, 0.f, 100.f);
+)
+
+ParamControllerFloat(RoadEdgesWidth, "RoadEdgesWidth", "   Road Edges Width", "Customize the road edges width. Default is 1/2 of the MUTCD average lane line width of 4 inches.", "../assets/offroad/icon_blank.png",
+  return QString::number(params.getFloat("RoadEdgesWidth")) + " inches";,
+  return std::clamp(v, 0.f, 24.f);
+)
+
 ParamControllerInt(ScreenBrightness, "ScreenBrightness", "Screen Brightness", "Set a custom screen brightness level or use the default 'Auto' brightness setting.", "../assets/offroad/icon_light.png",
   int brightness = params.getInt("ScreenBrightness");
   return brightness == 101 ? "Auto" : brightness == 0 ? "Screen Off" : QString::number(brightness) + "%";,
