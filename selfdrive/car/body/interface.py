@@ -30,7 +30,7 @@ class CarInterface(CarInterfaceBase):
 
     return ret
 
-  def _update(self, c, adjustable_follow):
+  def _update(self, c, adjustable_follow, experimental_mode_via_wheel):
     ret = self.CS.update(self.cp)
 
     # wait for everything to init first

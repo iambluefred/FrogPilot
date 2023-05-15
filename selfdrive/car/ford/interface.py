@@ -72,7 +72,7 @@ class CarInterface(CarInterfaceBase):
     ret.centerToFront = ret.wheelbase * 0.44
     return ret
 
-  def _update(self, c, adjustable_follow):
+  def _update(self, c, adjustable_follow, experimental_mode_via_wheel):
     ret = self.CS.update(self.cp, self.cp_cam)
 
     events = self.create_common_events(ret, extra_gears=[GearShifter.manumatic])

@@ -259,8 +259,8 @@ class CarInterface(CarInterfaceBase):
     return ret
 
   # returns a car.CarState
-  def _update(self, c, adjustable_follow):
-    ret = self.CS.update(self.cp, self.cp_cam, adjustable_follow)
+  def _update(self, c, adjustable_follow, experimental_mode_via_wheel):
+    ret = self.CS.update(self.cp, self.cp_cam, adjustable_follow, experimental_mode_via_wheel)
 
     # events
     events = self.create_common_events(ret)
