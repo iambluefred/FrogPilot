@@ -200,6 +200,11 @@ static void update_state(UIState *s) {
   if (sm.updated("carParams")) {
     scene.longitudinal_control = sm["carParams"].getCarParams().getOpenpilotLongitudinalControl();
   }
+  if (sm.updated("carState")) {
+    if (scene.rotating_wheel) {
+      scene.steering_angle_deg = (int)sm["carState"].getCarState().getSteeringAngleDeg();
+    }
+  }
   if (sm.updated("controlsState")) {
     scene.experimental_mode = sm["controlsState"].getControlsState().getExperimentalMode();
   }
@@ -220,6 +225,7 @@ void ui_update_params(UIState *s) {
   const bool frog_theme = params.getBool("FrogTheme");
   scene.frog_colors = frog_theme && params.getBool("FrogColors");
   scene.mute_dm = params.getBool("FireTheBabysitter") && params.getBool("MuteDM");
+  scene.rotating_wheel = params.getBool("RotatingWheel");
   scene.wide_camera_disabled = params.getBool("WideCameraDisable");
 }
 
