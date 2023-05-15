@@ -125,11 +125,13 @@ typedef struct UIScene {
   uint64_t started_frame;
 
   // FrogPilot variables
+  bool compass;
   bool experimental_mode;
   bool frog_colors;
   bool mute_dm;
   bool rotating_wheel;
   bool wide_camera_disabled;
+  int bearing_deg;
   int screen_brightness;
   int steering_angle_deg;
   int steering_wheel;

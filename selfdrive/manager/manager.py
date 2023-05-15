@@ -37,6 +37,7 @@ def manager_init() -> None:
 
   default_params: List[Tuple[str, Union[str, bytes]]] = [
     ("BackButton", "1"),
+    ("Compass", "1"),
     ("CompletedTrainingVersion", "0"),
     ("CustomRoadUI", "1"),
     ("DeviceShutdownTimer", "6"),
