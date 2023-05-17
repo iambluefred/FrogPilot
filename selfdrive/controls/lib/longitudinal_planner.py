@@ -187,7 +187,7 @@ class LongitudinalPlanner:
     # Determine the road curvature - Credit goes to to Pfeiferj!
     def road_curvature(lead, modeldata, standstill):
       # Check if there's no lead vehicle if necessary
-      if not (self.curves_lead and lead) and not standstill:
+      if not (self.curves_lead and lead) and not standstill and self.curves:
         predicted_lateral_accelerations = np.abs(np.array(modeldata.acceleration.y))
         predicted_velocities = np.array(modeldata.velocity.x)
         # Check if the number of predicted lateral accelerations and velocities are as expected
