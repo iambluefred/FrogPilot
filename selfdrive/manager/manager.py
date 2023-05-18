@@ -40,6 +40,7 @@ def manager_init() -> None:
     ("DisengageOnAccelerator", "0"),
     ("GsmMetered", "1"),
     ("HasAcceptedTerms", "0"),
+    ("IsLdwEnabled", "1"),
     ("LanguageSetting", "main_en"),
     ("OpenpilotEnabledToggle", "1"),
   ]
