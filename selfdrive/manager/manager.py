@@ -59,6 +59,7 @@ def manager_init() -> None:
     ("NumericalTemp", "1"),
     ("OneLaneChange", "1"),
     ("OpenpilotEnabledToggle", "1"),
+    ("RotatingWheel", "1"),
     ("ScreenBrightness", "100"),
     ("Sidebar", "1"),
     ("SilentMode", "0"),

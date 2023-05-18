@@ -206,18 +206,22 @@ void ExperimentalButton::updateState(const UIState &s) {
 }
 
 void ExperimentalButton::paintEvent(QPaintEvent *event) {
-  QPainter p(this);
-  p.setRenderHint(QPainter::Antialiasing);
+  // If the rotating steering wheel toggle is on hide the icon
+  static auto &scene = uiState()->scene;
+  if (!scene.rotating_wheel) {
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
 
-  QPoint center(btn_size / 2, btn_size / 2);
-  QPixmap img = isChecked() ? experimental_img : engage_img;
+    QPoint center(btn_size / 2, btn_size / 2);
+    QPixmap img = isChecked() ? experimental_img : engage_img;
 
-  p.setOpacity(1.0);
-  p.setPen(Qt::NoPen);
-  p.setBrush(QColor(0, 0, 0, 166));
-  p.drawEllipse(center, btn_size / 2, btn_size / 2);
-  p.setOpacity(isDown() ? 0.8 : 1.0);
-  p.drawPixmap((btn_size - img_size) / 2, (btn_size - img_size) / 2, img);
+    p.setOpacity(1.0);
+    p.setPen(Qt::NoPen);
+    p.setBrush(QColor(0, 0, 0, 166));
+    p.drawEllipse(center, btn_size / 2, btn_size / 2);
+    p.setOpacity(isDown() ? 0.8 : 1.0);
+    p.drawPixmap((btn_size - img_size) / 2, (btn_size - img_size) / 2, img);
+  }
 }
 
 
@@ -232,6 +236,8 @@ AnnotatedCameraWidget::AnnotatedCameraWidget(VisionStreamType type, QWidget* par
   main_layout->addWidget(experimental_btn, 0, Qt::AlignTop | Qt::AlignRight);
 
   dm_img = loadPixmap("../assets/img_driver_face.png", {img_size + 5, img_size + 5});
+  engage_img = loadPixmap("../assets/img_chffr_wheel.png", {img_size, img_size});
+  experimental_img = loadPixmap("../assets/img_experimental.svg", {img_size, img_size});
 }
 
 void AnnotatedCameraWidget::updateState(const UIState &s) {
@@ -294,6 +300,8 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
   setProperty("experimentalMode", s.scene.experimental_mode);
   setProperty("frogColors", s.scene.frog_colors);
   setProperty("muteDM", s.scene.mute_dm);
+  setProperty("rotatingWheel", s.scene.rotating_wheel);
+  setProperty("steeringAngleDeg", s.scene.steering_angle_deg);
 }
 
 void AnnotatedCameraWidget::drawHud(QPainter &p) {
@@ -444,6 +452,11 @@ void AnnotatedCameraWidget::drawHud(QPainter &p) {
   drawText(p, rect().center().x(), 290, speedUnit, 200);
 
   p.restore();
+
+  // Rotating steering wheel
+  if (rotatingWheel) {
+    drawRotatingWheel(p, rect().right() - btn_size / 2 - bdr_s * 2 + 25, btn_size / 2 + int(bdr_s * 1.5) - 20);
+  }
 }
 
 
@@ -749,4 +762,25 @@ void AnnotatedCameraWidget::showEvent(QShowEvent *event) {
 
   ui_update_params(uiState());
   prev_draw_t = millis_since_boot();
+}
+
+// FrogPilot widgets
+
+void AnnotatedCameraWidget::drawRotatingWheel(QPainter &p, int x, int y) {
+  // Enable Antialiasing
+  p.setRenderHint(QPainter::Antialiasing);
+  
+  // Set the icon according to the current status of "Experimental Mode"
+  QPixmap img = experimentalMode ? experimental_img : engage_img;
+
+  // Draw the icon and rotate it alongside the steering wheel
+  p.setOpacity(1.0);
+  p.setPen(Qt::NoPen);
+  p.setBrush(QColor(0, 0, 0, 166));
+  p.drawEllipse(x - btn_size / 2, y - btn_size / 2, btn_size, btn_size);
+  p.save();
+  p.translate(x, y);
+  p.rotate(-steeringAngleDeg);
+  p.drawPixmap(-img.size().width() / 2, -img.size().height() / 2, img);
+  p.restore();
 }
