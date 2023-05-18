@@ -6,6 +6,8 @@
 
 #include <QDebug>
 
+#include <QProcess>
+
 #include "selfdrive/ui/qt/offroad/networking.h"
 
 #ifdef ENABLE_MAPS
@@ -229,6 +231,33 @@ DevicePanel::DevicePanel(SettingsWindow *parent) : ListWidget(parent) {
     }
   });
   addItem(translateBtn);
+
+  // Panda flashing button
+  auto flashPandaBtn = new ButtonControl(tr("Flash Panda"), tr("FLASH"), "");
+  connect(flashPandaBtn, &ButtonControl::clicked, [&]() {
+    if (!ConfirmationDialog::confirm(tr("Are you sure you want to flash the Panda?"), tr("Flash"), this)) return;
+    QProcess process;
+    // Get Panda type
+    const SubMaster &sm = *(uiState()->sm);
+    static auto pandaStates = sm["pandaStates"].getPandaStates();
+    // Choose recovery script based on Panda type
+    if (pandaStates.size() > 0) {
+      const auto pandaType = pandaStates[0].getPandaType();
+      const bool isRedPanda = (pandaType == cereal::PandaState::PandaType::RED_PANDA || 
+                               pandaType == cereal::PandaState::PandaType::RED_PANDA_V2);
+      const QString recoveryScript = isRedPanda ? "./recover.sh" : "./recover.py";
+      // Run recovery script and flash Panda
+      process.setWorkingDirectory("/data/openpilot/panda/board");
+      process.start("/bin/sh", QStringList{"-c", recoveryScript});
+      process.waitForFinished();
+    }
+    // Run the killall script as a redundancy
+    process.setWorkingDirectory("/data/openpilot/panda");
+    process.start("/bin/sh", QStringList{"-c", "pkill -f boardd; PYTHONPATH=.. python -c \"from panda import Panda; Panda().flash()\""});
+    process.waitForFinished();
+    Hardware::reboot();
+  });
+  addItem(flashPandaBtn);
 
   QObject::connect(uiState(), &UIState::offroadTransition, [=](bool offroad) {
     for (auto btn : findChildren<ButtonControl *>()) {
