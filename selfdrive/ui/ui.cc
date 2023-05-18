@@ -234,6 +234,11 @@ static void update_state(UIState *s) {
   if (sm.updated("controlsState")) {
     scene.experimental_mode = sm["controlsState"].getControlsState().getExperimentalMode();
   }
+  if (sm.updated("gpsLocationExternal")) {
+    if (scene.compass) {
+      scene.bearing_deg = (int)sm["gpsLocationExternal"].getGpsLocationExternal().getBearingDeg();
+    }
+  }
   if (sm.updated("wideRoadCameraState")) {
     float scale = (sm["wideRoadCameraState"].getWideRoadCameraState().getSensor() == cereal::FrameData::ImageSensor::AR0231) ? 6.0f : 1.0f;
     scene.light_sensor = std::max(100.0f - scale * sm["wideRoadCameraState"].getWideRoadCameraState().getExposureValPercent(), 0.0f);
@@ -249,6 +254,7 @@ void ui_update_params(UIState *s) {
 
   // FrogPilot variables
   const bool frog_theme = params.getBool("FrogTheme");
+  scene.compass = params.getBool("Compass");
   scene.frog_colors = frog_theme && params.getBool("FrogColors");
   scene.mute_dm = params.getBool("FireTheBabysitter") && params.getBool("MuteDM");
   scene.rotating_wheel = params.getBool("RotatingWheel");
@@ -300,7 +306,7 @@ UIState::UIState(QObject *parent) : QObject(parent) {
   sm = std::make_unique<SubMaster, const std::initializer_list<const char *>>({
     "modelV2", "controlsState", "liveCalibration", "radarState", "deviceState", "roadCameraState",
     "pandaStates", "carParams", "driverMonitoringState", "carState", "liveLocationKalman", "driverStateV2",
-    "wideRoadCameraState", "managerState", "navInstruction", "navRoute", "uiPlan",
+    "wideRoadCameraState", "managerState", "navInstruction", "navRoute", "uiPlan", "gpsLocationExternal",
   });
 
   Params params;
