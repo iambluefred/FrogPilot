@@ -13,6 +13,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
 
   const std::vector<std::tuple<QString, QString, QString, QString>> toggles = {
     {"FrogTheme", "FrogPilot Theme", "Enable the beloved FrogPilot Theme! Disable toggle to revert back to the stock openpilot theme.", "../assets/images/frog_button_home.png"},
+    {"DeviceShutdownTimer", "Device Shutdown Timer", "Set the timer for when the device turns off after being offroad to reduce energy waste and prevent battery drain.", "../assets/offroad/icon_time.png"},
     {"ScreenBrightness", "Screen Brightness", "Choose a custom screen brightness level or use the default 'Auto' brightness setting.", "../assets/offroad/icon_light.png"},
     {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"}
   };
@@ -25,6 +26,9 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
         {"FrogIcons", "FrogPilot Icons", "Replace stock openpilot icons with FrogPilot's."},
         {"FrogSounds", "FrogPilot Sounds", "Replace stock openpilot sounds with FrogPilot's."}
       });
+    } else if (key == "DeviceShutdownTimer") {
+      mainLayout->addWidget(new DeviceShutdownTimer());
+      mainLayout->addWidget(horizontal_line());
     } else if (key == "ScreenBrightness") {
       mainLayout->addWidget(new ScreenBrightness());
       mainLayout->addWidget(horizontal_line());
