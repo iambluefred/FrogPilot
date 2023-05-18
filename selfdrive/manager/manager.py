@@ -47,6 +47,7 @@ def manager_init() -> None:
     ("IsLdwEnabled", "1"),
     ("LanguageSetting", "main_en"),
     ("OpenpilotEnabledToggle", "1"),
+    ("ScreenBrightness", "100"),
   ]
   if not PC:
     default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))

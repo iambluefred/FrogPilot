@@ -227,6 +227,7 @@ void ui_live_update_params(UIState *s) {
   // FrogPilot variables that need to be updated live
   // FrogPilot variables that need to be updated whenever the user changes its toggle value
   if (params.getBool("FrogPilotTogglesUpdated")) {
+    scene.screen_brightness = params.getInt("ScreenBrightness");
   }
 }
 
@@ -343,6 +344,11 @@ void Device::updateBrightness(const UIState &s) {
   int brightness = brightness_filter.update(clipped_brightness);
   if (!awake) {
     brightness = 0;
+  } else if (s.scene.started && s.scene.screen_brightness <= 100) {
+    brightness = s.scene.screen_brightness;
+  } else if (s.scene.screen_brightness <= 100) {
+    // Don't let the screen brightness go below 1% when offroad
+    brightness = fmax(1, s.scene.screen_brightness);
   }
 
   if (brightness != last_brightness) {
