@@ -113,6 +113,10 @@ class Controls:
     self.is_ldw_enabled = self.params.get_bool("IsLdwEnabled")
     openpilot_enabled_toggle = self.params.get_bool("OpenpilotEnabledToggle")
     passive = self.params.get_bool("Passive") or not openpilot_enabled_toggle
+    
+    # FrogPilot variables
+    frog_theme = self.params.get_bool("FrogTheme")
+    self.frog_sounds = frog_theme and self.params.get_bool("FrogSounds")
 
     # detect sound card presence and ensure successful init
     sounds_available = HARDWARE.get_sound_card_online()
@@ -638,7 +642,7 @@ class Controls:
         good_speed = CS.vEgo > 5
         max_torque = abs(self.last_actuators.steer) > 0.99
         if undershooting and turning and good_speed and max_torque:
-          lac_log.active and self.events.add(EventName.steerSaturated)
+          lac_log.active and self.events.add(EventName.frogSteerSaturated if self.frog_sounds else EventName.steerSaturated)
       elif lac_log.saturated:
         dpath_points = lat_plan.dPathPoints
         if len(dpath_points):

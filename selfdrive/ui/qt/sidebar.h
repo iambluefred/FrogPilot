@@ -50,6 +50,9 @@ protected:
   const QColor good_color = QColor(255, 255, 255);
   const QColor warning_color = QColor(218, 202, 37);
   const QColor danger_color = QColor(201, 34, 49);
+  
+  // FrogPilot colors
+  const QColor frog_color = QColor(23, 134, 68);
 
   ItemStatus connect_status, panda_status, temp_status;
   QString net_type;
@@ -57,4 +60,9 @@ protected:
 
 private:
   std::unique_ptr<PubMaster> pm;
+
+  // FrogPilot variables
+  bool isFrogColors;
+  bool isFrogIcons;
+  QPixmap frog_home_img, frog_settings_img;
 };

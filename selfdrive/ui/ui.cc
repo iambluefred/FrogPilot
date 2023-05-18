@@ -215,6 +215,10 @@ void ui_update_params(UIState *s) {
   UIScene &scene = s->scene;
   s->scene.is_metric = params.getBool("IsMetric");
   s->scene.map_on_left = params.getBool("NavSettingLeftSide");
+
+  // FrogPilot variables
+  const bool frog_theme = params.getBool("FrogTheme");
+  scene.frog_colors = frog_theme && params.getBool("FrogColors");
 }
 
 void ui_live_update_params(UIState *s) {
