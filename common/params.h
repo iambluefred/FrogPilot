@@ -32,6 +32,14 @@ public:
   inline bool getBool(const std::string &key, bool block = false) {
     return get(key, block) == "1";
   }
+  inline float getFloat(const std::string &key, bool block = false) {
+    std::string value = get(key, block);
+    return value.empty() ? 0 : std::stof(value);
+  }
+  inline int getInt(const std::string &key, bool block = false) {
+    std::string value = get(key, block);
+    return value.empty() ? 0 : std::stoi(value);
+  }
   std::map<std::string, std::string> readAll();
 
   // helpers for writing values
@@ -41,6 +49,12 @@ public:
   }
   inline int putBool(const std::string &key, bool val) {
     return put(key.c_str(), val ? "1" : "0", 1);
+  }
+  inline int putFloat(const std::string &key, float val) {
+    return put(key.c_str(), std::to_string(val).c_str(), std::to_string(val).size());
+  }
+  inline int putInt(const std::string &key, int val) {
+    return put(key.c_str(), std::to_string(val).c_str(), std::to_string(val).size());
   }
 
 private:
