@@ -227,6 +227,7 @@ static void update_state(UIState *s) {
     scene.longitudinal_control = sm["carParams"].getCarParams().getOpenpilotLongitudinalControl();
     if (scene.longitudinal_control) {
       scene.adjustable_follow_distance = sm["carParams"].getCarParams().getAdjustableFollow();
+      scene.experimental_mode_via_wheel = sm["carParams"].getCarParams().getExperimentalModeViaWheel();
     }
   }
   if (sm.updated("carState")) {
@@ -242,6 +243,10 @@ static void update_state(UIState *s) {
     }
     if (scene.rotating_wheel) {
       scene.steering_angle_deg = (int)sm["carState"].getCarState().getSteeringAngleDeg();
+    }
+    if (scene.experimental_mode_via_wheel && !scene.steering_wheel_car_checked) {
+      scene.steering_wheel_car = sm["carState"].getCarState().getSteeringWheelCar();
+      scene.steering_wheel_car_checked = true;
     }
   }
   if (sm.updated("controlsState")) {

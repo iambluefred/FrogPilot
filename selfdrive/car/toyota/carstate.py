@@ -4,6 +4,7 @@ from cereal import car
 from common.conversions import Conversions as CV
 from common.numpy_fast import mean
 from common.filter_simple import FirstOrderFilter
+from common.params import Params
 from common.realtime import DT_CTRL
 from opendbc.can.can_define import CANDefine
 from opendbc.can.parser import CANParser
@@ -31,8 +32,12 @@ class CarState(CarStateBase):
     self.lkas_hud = {}
 
     # FrogPilot variables
+    self.params = Params()
     self.adjustable_follow = self.CP.adjustableFollow
+    self.experimental_mode_via_wheel = self.CP.experimentalModeViaWheel
     self.distance_btn = 0
+    self.lkas_previously_pressed = False
+    self.steeringWheelCarSet = False
 
   def update(self, cp, cp_cam):
     ret = car.CarState.new_message()
@@ -147,9 +152,20 @@ class CarState(CarStateBase):
       # These cars have the acc_control on car can
       self.distance_btn = 1 if cp.vl["ACC_CONTROL"]["DISTANCE"] == 1 else 0
       ret.distanceLines = cp.vl["PCM_CRUISE_SM"]["DISTANCE_LINES"]
+
+    # Check if the "LKAS" button is pressed and the toggle is on
+    lkas_pressed = cp_cam.vl["LKAS_HUD"]["LKAS_STATUS"] == 1 if self.experimental_mode_via_wheel else False
+    if lkas_pressed and not self.lkas_previously_pressed and ret.cruiseState.available:
+      experimental_mode = self.params.get_bool("ExperimentalMode")
+      # Invert the value of "ExperimentalMode"
+      self.params.put_bool("ExperimentalMode", not experimental_mode)
+    self.lkas_previously_pressed = lkas_pressed
     
     # Disable the onroad widgets since they're not needed
     ret.adjustableFollowCar = any(self.CP.carFingerprint in car for car in (TSS2_CAR, RADAR_ACC_CAR))
+    if lkas_pressed and not self.steeringWheelCarSet:
+      self.steeringWheelCarSet = True
+    ret.steeringWheelCar = self.steeringWheelCarSet
 
     ret.genericToggle = bool(cp.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
     ret.espDisabled = cp.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
@@ -306,6 +322,7 @@ class CarState(CarStateBase):
         ("FORCE", "PRE_COLLISION"),
         ("ACC_TYPE", "ACC_CONTROL"),
         ("FCW", "ACC_HUD"),
+        ("LKAS_STATUS", "LKAS_HUD"),
       ]
       checks += [
         ("PRE_COLLISION", 33),

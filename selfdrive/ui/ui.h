@@ -130,10 +130,13 @@ typedef struct UIScene {
   bool adjustable_follow_distance_car_checked;
   bool compass;
   bool experimental_mode;
+  bool experimental_mode_via_wheel;
   bool frog_colors;
   bool frog_signals;
   bool mute_dm;
   bool rotating_wheel;
+  bool steering_wheel_car;
+  bool steering_wheel_car_checked;
   bool wide_camera_disabled;
   int adjustable_follow_distance_profile;
   int bearing_deg;

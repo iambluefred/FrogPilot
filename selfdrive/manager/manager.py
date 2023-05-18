@@ -45,6 +45,7 @@ def manager_init() -> None:
     ("DisableInternetCheck", "1"),
     ("DisableAd", "1"),
     ("DisengageOnAccelerator", "0"),
+    ("ExperimentalModeViaWheel", "1"),
     ("ExperimentalPersonalTune", "0"),
     ("FireTheBabysitter", "1"),
     ("FrogColors", "1"),
