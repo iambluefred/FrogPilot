@@ -236,6 +236,9 @@ static void update_state(UIState *s) {
       scene.adjustable_follow_distance_car = sm["carState"].getCarState().getAdjustableFollowCar();
       scene.adjustable_follow_distance_car_checked = true;
     }
+    if (scene.adjustable_follow_distance && !scene.adjustable_follow_distance_car) {
+      scene.adjustable_follow_distance_profile = sm["carState"].getCarState().getDistanceLines();
+    }
     if (scene.frog_signals) {
       scene.blindspot_left = sm["carState"].getCarState().getLeftBlindspot();
       scene.blindspot_right = sm["carState"].getCarState().getRightBlindspot();
@@ -285,9 +288,6 @@ void ui_live_update_params(UIState *s) {
   static auto params = Params();
   UIScene &scene = s->scene;
   // FrogPilot variables that need to be updated live
-  if (scene.adjustable_follow_distance && !scene.adjustable_follow_distance_car) {
-    scene.adjustable_follow_distance_profile = params.getInt("AdjustableFollowDistanceProfile");
-  }
   if (scene.conditional_experimental) {
     scene.conditional_status = params.getInt("ConditionalStatus");
     if (scene.experimental_mode_via_wheel && !scene.steering_wheel_car) {

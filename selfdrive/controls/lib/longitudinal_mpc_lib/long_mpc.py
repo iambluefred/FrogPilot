@@ -2,6 +2,7 @@
 import os
 import numpy as np
 
+from cereal import car
 from common.params import Params
 from common.realtime import sec_since_boot
 from common.numpy_fast import clip, interp
@@ -355,6 +356,7 @@ class LongitudinalMpc:
 
   def update_TF(self, carstate, personal_tune):
     if self.adjustable_follow or personal_tune:
+      ret = car.CarState.new_message()
       # Distance profiles customized by FrogAi for FrogPilot
       distance_profiles = {
         1: [1.25, 1.20, 1.15, 1.10, 1.05, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00], # Aggressive
@@ -370,6 +372,7 @@ class LongitudinalMpc:
           profile_key = carstate.distanceLines
         else:
           profile_key = Params().get_int("AdjustableFollowDistanceProfile")
+          ret.distanceLines = profile_key
       else:
         profile_key = 2
       profile = distance_profiles.get(profile_key, distance_profiles[1])
