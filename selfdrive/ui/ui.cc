@@ -242,9 +242,6 @@ static void update_state(UIState *s) {
       scene.turn_signal_left = sm["carState"].getCarState().getLeftBlinker();
       scene.turn_signal_right = sm["carState"].getCarState().getRightBlinker();
     }
-    if (scene.conditional_experimental && scene.steering_wheel_car) {
-      scene.conditional_overridden = sm["carState"].getCarState().getConditionalOverridden();
-    }
     if (scene.rotating_wheel) {
       scene.steering_angle_deg = (int)sm["carState"].getCarState().getSteeringAngleDeg();
     }

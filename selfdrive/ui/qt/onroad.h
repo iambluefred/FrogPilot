@@ -33,6 +33,7 @@ class ExperimentalButton : public QPushButton {
   Q_OBJECT
 
   // FrogPilot properties
+  Q_PROPERTY(int conditionalOverridden MEMBER conditionalOverridden);
   Q_PROPERTY(int steeringWheel MEMBER steeringWheel);
 
 public:
@@ -47,6 +48,7 @@ private:
   QPixmap experimental_img;
 
   // FrogPilot variables
+  int conditionalOverridden;
   int steeringWheel;
   std::map<int, QPixmap> wheel_images;
 };

@@ -263,6 +263,7 @@ void ExperimentalButton::updateState(const UIState &s) {
   setEnabled(params.getBool("ExperimentalModeConfirmed") && experimental_mode_available);
   
   // FrogPilot properties
+  setProperty("conditionalOverridden", sm["carState"].getCarState().getConditionalOverridden());
   setProperty("steeringWheel", s.scene.steering_wheel);
 }
 
@@ -281,7 +282,7 @@ void ExperimentalButton::paintEvent(QPaintEvent *event) {
 
     p.setOpacity(1.0);
     p.setPen(Qt::NoPen);
-    p.setBrush(scene.conditional_status || scene.conditional_overridden ? QColor(255, 246, 0, 255) : steeringWheel && isChecked() ? QColor(218, 111, 37, 241) : QColor(0, 0, 0, 166));
+    p.setBrush(scene.conditional_status || conditionalOverridden ? QColor(255, 246, 0, 255) : steeringWheel && isChecked() ? QColor(218, 111, 37, 241) : QColor(0, 0, 0, 166));
     p.drawEllipse(center, btn_size / 2, btn_size / 2);
     p.setOpacity(isDown() ? 0.8 : 1.0);
     p.drawPixmap((btn_size - img_size) / 2, (btn_size - img_size) / 2, img);
@@ -409,7 +410,7 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
   setProperty("blindspotRight", s.scene.blindspot_right);
   setProperty("compass", s.scene.compass);
   setProperty("conditionalExperimental", s.scene.conditional_experimental);
-  setProperty("conditionalOverridden", s.scene.conditional_overridden);
+  setProperty("conditionalOverridden", sm["carState"].getCarState().getConditionalOverridden());
   setProperty("conditionalSpeed", s.scene.conditional_speed);
   setProperty("conditionalSpeedLead", s.scene.conditional_speed_lead);
   setProperty("conditionalStatus", s.scene.conditional_status);

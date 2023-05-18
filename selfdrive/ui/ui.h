@@ -143,7 +143,6 @@ typedef struct UIScene {
   int bearing_deg;
   int blindspot_left;
   int blindspot_right;
-  int conditional_overridden;
   int conditional_speed;
   int conditional_speed_lead;
   int conditional_status;
