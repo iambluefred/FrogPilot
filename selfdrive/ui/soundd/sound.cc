@@ -20,13 +20,14 @@ Sound::Sound(QObject *parent) : sm({"controlsState", "deviceState", "microphone"
   static auto params = Params();
   const bool isFrogTheme = params.getBool("FrogTheme");
   const bool isFrogSounds = isFrogTheme && params.getBool("FrogSounds");
+  const bool isSilentMode = params.getBool("SilentMode");
 
   for (auto &[alert, fn, loops] : sound_list) {
     QSoundEffect *s = new QSoundEffect(this);
     QObject::connect(s, &QSoundEffect::statusChanged, [=]() {
       assert(s->status() != QSoundEffect::Error);
     });
-    s->setSource(QUrl::fromLocalFile(QString("../../assets/") + (isFrogSounds ? "frogsounds/" : "sounds/") + QString(fn)));
+    s->setSource(QUrl::fromLocalFile(QString("../../assets/") + (isSilentMode ? "nosounds/" : isFrogSounds ? "frogsounds/" : "sounds/") + QString(fn)));
     sounds[alert] = {s, loops};
   }
 
