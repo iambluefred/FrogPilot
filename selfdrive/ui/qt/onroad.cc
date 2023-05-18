@@ -184,6 +184,15 @@ ExperimentalButton::ExperimentalButton(QWidget *parent) : QPushButton(parent) {
   engage_img = loadPixmap("../assets/img_chffr_wheel.png", {img_size, img_size});
   experimental_img = loadPixmap("../assets/img_experimental.svg", {img_size, img_size});
 
+  // Custom steering wheel images
+  wheel_images = {
+    {0, loadPixmap("../assets/img_chffr_wheel.png", {img_size, img_size})},
+    {1, loadPixmap("../assets/lexus.png", {img_size, img_size})},
+    {2, loadPixmap("../assets/toyota.png", {img_size, img_size})},
+    {3, loadPixmap("../assets/frog.png", {img_size, img_size})},
+    {4, loadPixmap("../assets/rocket.png", {img_size, img_size})}
+  };
+
   QObject::connect(this, &QPushButton::toggled, [=](bool checked) {
     params.putBool("ExperimentalMode", checked);
   });
@@ -203,21 +212,27 @@ void ExperimentalButton::updateState(const UIState &s) {
   const auto cp = sm["carParams"].getCarParams();
   const bool experimental_mode_available = cp.getExperimentalLongitudinalAvailable() ? params.getBool("ExperimentalLongitudinalEnabled") : cp.getOpenpilotLongitudinalControl();
   setEnabled(params.getBool("ExperimentalModeConfirmed") && experimental_mode_available);
+  
+  // FrogPilot properties
+  setProperty("steeringWheel", s.scene.steering_wheel);
 }
 
 void ExperimentalButton::paintEvent(QPaintEvent *event) {
   // If the rotating steering wheel toggle is on hide the icon
   static auto &scene = uiState()->scene;
   if (!scene.rotating_wheel) {
+    // Custom steering wheel icon
+    engage_img = wheel_images[steeringWheel];
+
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
     QPoint center(btn_size / 2, btn_size / 2);
-    QPixmap img = isChecked() ? experimental_img : engage_img;
+    QPixmap img = steeringWheel ? engage_img : (isChecked() ? experimental_img : engage_img);
 
     p.setOpacity(1.0);
     p.setPen(Qt::NoPen);
-    p.setBrush(QColor(0, 0, 0, 166));
+    p.setBrush(steeringWheel && isChecked() ? QColor(218, 111, 37, 241) : QColor(0, 0, 0, 166));
     p.drawEllipse(center, btn_size / 2, btn_size / 2);
     p.setOpacity(isDown() ? 0.8 : 1.0);
     p.drawPixmap((btn_size - img_size) / 2, (btn_size - img_size) / 2, img);
@@ -238,6 +253,15 @@ AnnotatedCameraWidget::AnnotatedCameraWidget(VisionStreamType type, QWidget* par
   dm_img = loadPixmap("../assets/img_driver_face.png", {img_size + 5, img_size + 5});
   engage_img = loadPixmap("../assets/img_chffr_wheel.png", {img_size, img_size});
   experimental_img = loadPixmap("../assets/img_experimental.svg", {img_size, img_size});
+  
+  // Custom steering wheel images
+  wheel_images = {
+    {0, loadPixmap("../assets/img_chffr_wheel.png", {img_size, img_size})},
+    {1, loadPixmap("../assets/lexus.png", {img_size, img_size})},
+    {2, loadPixmap("../assets/toyota.png", {img_size, img_size})},
+    {3, loadPixmap("../assets/frog.png", {img_size, img_size})},
+    {4, loadPixmap("../assets/rocket.png", {img_size, img_size})}
+  };
 }
 
 void AnnotatedCameraWidget::updateState(const UIState &s) {
@@ -302,6 +326,7 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
   setProperty("muteDM", s.scene.mute_dm);
   setProperty("rotatingWheel", s.scene.rotating_wheel);
   setProperty("steeringAngleDeg", s.scene.steering_angle_deg);
+  setProperty("steeringWheel", s.scene.steering_wheel);
 }
 
 void AnnotatedCameraWidget::drawHud(QPainter &p) {
@@ -767,16 +792,19 @@ void AnnotatedCameraWidget::showEvent(QShowEvent *event) {
 // FrogPilot widgets
 
 void AnnotatedCameraWidget::drawRotatingWheel(QPainter &p, int x, int y) {
+  // Custom steering wheel icon
+  engage_img = wheel_images[steeringWheel];
+
   // Enable Antialiasing
   p.setRenderHint(QPainter::Antialiasing);
   
   // Set the icon according to the current status of "Experimental Mode"
-  QPixmap img = experimentalMode ? experimental_img : engage_img;
+  QPixmap img = steeringWheel ? engage_img : (experimentalMode ? experimental_img : engage_img);
 
   // Draw the icon and rotate it alongside the steering wheel
   p.setOpacity(1.0);
   p.setPen(Qt::NoPen);
-  p.setBrush(QColor(0, 0, 0, 166));
+  p.setBrush(steeringWheel && experimentalMode ? QColor(218, 111, 37, 241) : QColor(0, 0, 0, 166));
   p.drawEllipse(x - btn_size / 2, y - btn_size / 2, btn_size, btn_size);
   p.save();
   p.translate(x, y);

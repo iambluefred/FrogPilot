@@ -189,6 +189,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"Sidebar", PERSISTENT},
     {"SilentMode", PERSISTENT},
     {"SshEnabled", PERSISTENT},
+    {"SteeringWheel", PERSISTENT},
     {"SubscriberInfo", PERSISTENT},
     {"TermsVersion", PERSISTENT},
     {"Timezone", PERSISTENT},

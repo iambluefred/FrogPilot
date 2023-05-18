@@ -23,6 +23,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"ScreenBrightness", "Screen Brightness", "Choose a custom screen brightness level or use the default 'Auto' brightness setting.", "../assets/offroad/icon_light.png"},
     {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"},
     {"SilentMode", "Silent Mode", "Disables all openpilot sounds for a completely silent experience.", "../assets/offroad/icon_mute.png"},
+    {"SteeringWheel", "Steering Wheel Icon", "Replace the stock openpilot steering wheel icon with a custom icon.\n\nWant to submit your own steering wheel? Message me on Discord:\nFrogsGoMoo #6969.", "../assets/offroad/icon_openpilot.png"},
     {"WideCameraDisable", "Wide Camera Disabled (Cosmetic Only)", "Disable the wide camera display while onroad. This toggle is purely cosmetic and will not affect openpilot's use of the wide camera.", "../assets/offroad/icon_camera.png"}
   };
 
@@ -51,6 +52,9 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
       });
     } else if (key == "ScreenBrightness") {
       mainLayout->addWidget(new ScreenBrightness());
+      mainLayout->addWidget(horizontal_line());
+    } else if (key == "SteeringWheel") {
+      mainLayout->addWidget(new SteeringWheel());
       mainLayout->addWidget(horizontal_line());
     } else {
       mainLayout->addWidget(createParamControl(key, label, desc, icon, parent));

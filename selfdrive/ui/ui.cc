@@ -236,6 +236,7 @@ void ui_live_update_params(UIState *s) {
   // FrogPilot variables that need to be updated whenever the user changes its toggle value
   if (params.getBool("FrogPilotTogglesUpdated")) {
     scene.screen_brightness = params.getInt("ScreenBrightness");
+    scene.steering_wheel = params.getInt("SteeringWheel");
   }
 }
 
