@@ -115,6 +115,7 @@ class Controls:
     passive = self.params.get_bool("Passive") or not openpilot_enabled_toggle
     
     # FrogPilot variables
+    self.conditional_experimental_mode = self.CP.conditionalExperimentalMode
     fire_the_babysitter = self.params.get_bool("FireTheBabysitter")
     frog_theme = self.params.get_bool("FrogTheme")
     self.frog_sounds = frog_theme and self.params.get_bool("FrogSounds")
@@ -845,7 +846,11 @@ class Controls:
     self.prof.checkpoint("Ratekeeper", ignore=True)
 
     self.is_metric = self.params.get_bool("IsMetric")
-    self.experimental_mode = self.params.get_bool("ExperimentalMode") and self.CP.openpilotLongitudinalControl
+    if self.CP.openpilotLongitudinalControl:
+      if self.conditional_experimental_mode:
+        self.experimental_mode = self.sm['longitudinalPlan'].conditionalExperimentalMode
+      else:
+        self.experimental_mode = self.params.get_bool("ExperimentalMode")
 
     # Sample data from sockets and get a carState
     CS = self.data_sample()

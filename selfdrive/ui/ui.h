@@ -129,6 +129,7 @@ typedef struct UIScene {
   bool adjustable_follow_distance_car;
   bool adjustable_follow_distance_car_checked;
   bool compass;
+  bool conditional_experimental;
   bool experimental_mode;
   bool experimental_mode_via_wheel;
   bool frog_colors;
@@ -142,6 +143,11 @@ typedef struct UIScene {
   int bearing_deg;
   int blindspot_left;
   int blindspot_right;
+  int conditional_overridden;
+  int conditional_speed;
+  int conditional_speed_lead;
+  int conditional_status;
+  int experimental_mode_override;
   int screen_brightness;
   int steering_angle_deg;
   int steering_wheel;

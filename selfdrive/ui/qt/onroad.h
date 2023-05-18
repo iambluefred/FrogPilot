@@ -74,6 +74,7 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(bool blindspotLeft MEMBER blindspotLeft);
   Q_PROPERTY(bool blindspotRight MEMBER blindspotRight);
   Q_PROPERTY(bool compass MEMBER compass);
+  Q_PROPERTY(bool conditionalExperimental MEMBER conditionalExperimental);
   Q_PROPERTY(bool experimentalMode MEMBER experimentalMode);
   Q_PROPERTY(bool frogColors MEMBER frogColors);
   Q_PROPERTY(bool frogSignals MEMBER frogSignals);
@@ -83,6 +84,10 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(bool turnSignalRight MEMBER turnSignalRight);
   Q_PROPERTY(int adjustableFollowDistanceProfile MEMBER adjustableFollowDistanceProfile);
   Q_PROPERTY(int bearingDeg MEMBER bearingDeg);
+  Q_PROPERTY(int conditionalOverridden MEMBER conditionalOverridden);
+  Q_PROPERTY(int conditionalSpeed MEMBER conditionalSpeed);
+  Q_PROPERTY(int conditionalSpeedLead MEMBER conditionalSpeedLead);
+  Q_PROPERTY(int conditionalStatus MEMBER conditionalStatus);
   Q_PROPERTY(int steeringAngleDeg MEMBER steeringAngleDeg);
   Q_PROPERTY(int steeringWheel MEMBER steeringWheel);
 
@@ -97,6 +102,7 @@ private:
   // FrogPilot widgets
   void drawAdjustableFollowDistance(QPainter &p);
   void drawCompass(QPainter &p);
+  void drawConditionalExperimentalStatus(QPainter &p);
   void drawFrogSignals(QPainter &p);
   void drawRotatingWheel(QPainter &p, int x, int y);
 
@@ -127,6 +133,7 @@ private:
   bool blindspotLeft;
   bool blindspotRight;
   bool compass;
+  bool conditionalExperimental;
   bool experimentalMode;
   bool frogColors;
   bool frogSignals;
@@ -137,6 +144,10 @@ private:
   int adjustableFollowDistanceProfile;
   int animationFrameIndex;
   int bearingDeg;
+  int conditionalOverridden;
+  int conditionalSpeed;
+  int conditionalSpeedLead;
+  int conditionalStatus;
   int steeringAngleDeg;
   int steeringWheel;
   QPixmap compass_inner_img;
