@@ -39,6 +39,7 @@ def manager_init() -> None:
     ("CompletedTrainingVersion", "0"),
     ("DeviceShutdownTimer", "6"),
     ("DisableInternetCheck", "1"),
+    ("DisableAd", "1"),
     ("DisengageOnAccelerator", "0"),
     ("FrogColors", "1"),
     ("FrogIcons", "1"),
