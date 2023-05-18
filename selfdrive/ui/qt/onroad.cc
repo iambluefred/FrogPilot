@@ -1110,8 +1110,8 @@ void AnnotatedCameraWidget::drawFrogSignals(QPainter &p) {
   // Calculate the vertical position for the turn signals
   const int baseYPosition = (height() - signalHeight) / 2 + (conditionalExperimental ? 225 : 300);
   // Calculate the x-coordinates for the turn signals
-  int leftSignalXPosition = width() + 75 - signalWidth - (!blindspotLeft) * 300 * animationFrameIndex;
-  int rightSignalXPosition = (-75) + (!blindspotRight) * 300 * animationFrameIndex;
+  int leftSignalXPosition = width() + 75 - signalWidth - 300 * (blindspotLeft ? 1 : animationFrameIndex);
+  int rightSignalXPosition = (-75) + 300 * (blindspotRight ? 1 : animationFrameIndex);
 
   // Enable Antialiasing
   p.setRenderHint(QPainter::Antialiasing);
