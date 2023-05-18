@@ -125,6 +125,9 @@ typedef struct UIScene {
   uint64_t started_frame;
 
   // FrogPilot variables
+  bool adjustable_follow_distance;
+  bool adjustable_follow_distance_car;
+  bool adjustable_follow_distance_car_checked;
   bool compass;
   bool experimental_mode;
   bool frog_colors;
@@ -132,6 +135,7 @@ typedef struct UIScene {
   bool mute_dm;
   bool rotating_wheel;
   bool wide_camera_disabled;
+  int adjustable_follow_distance_profile;
   int bearing_deg;
   int blindspot_left;
   int blindspot_right;

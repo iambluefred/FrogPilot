@@ -36,6 +36,8 @@ def manager_init() -> None:
   params.clear_all(ParamKeyType.CLEAR_ON_MANAGER_START)
 
   default_params: List[Tuple[str, Union[str, bytes]]] = [
+    ("AdjustableFollowDistance", "1"),
+    ("AdjustableFollowDistanceProfile", "2"),
     ("Compass", "1"),
     ("CompletedTrainingVersion", "0"),
     ("CustomRoadUI", "1"),

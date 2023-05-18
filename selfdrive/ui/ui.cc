@@ -225,8 +225,15 @@ static void update_state(UIState *s) {
   }
   if (sm.updated("carParams")) {
     scene.longitudinal_control = sm["carParams"].getCarParams().getOpenpilotLongitudinalControl();
+    if (scene.longitudinal_control) {
+      scene.adjustable_follow_distance = sm["carParams"].getCarParams().getAdjustableFollow();
+    }
   }
   if (sm.updated("carState")) {
+    if (scene.adjustable_follow_distance && !scene.adjustable_follow_distance_car_checked) {
+      scene.adjustable_follow_distance_car = sm["carState"].getCarState().getAdjustableFollowCar();
+      scene.adjustable_follow_distance_car_checked = true;
+    }
     if (scene.frog_signals) {
       scene.blindspot_left = sm["carState"].getCarState().getLeftBlindspot();
       scene.blindspot_right = sm["carState"].getCarState().getRightBlindspot();
@@ -272,6 +279,9 @@ void ui_live_update_params(UIState *s) {
   static auto params = Params();
   UIScene &scene = s->scene;
   // FrogPilot variables that need to be updated live
+  if (scene.adjustable_follow_distance && !scene.adjustable_follow_distance_car) {
+    scene.adjustable_follow_distance_profile = params.getInt("AdjustableFollowDistanceProfile");
+  }
   // FrogPilot variables that need to be updated whenever the user changes its toggle value
   if (params.getBool("FrogPilotTogglesUpdated")) {
     scene.screen_brightness = params.getInt("ScreenBrightness");
