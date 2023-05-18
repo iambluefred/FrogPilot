@@ -38,6 +38,7 @@ def manager_init() -> None:
   default_params: List[Tuple[str, Union[str, bytes]]] = [
     ("CompletedTrainingVersion", "0"),
     ("DeviceShutdownTimer", "6"),
+    ("DisableInternetCheck", "1"),
     ("DisengageOnAccelerator", "0"),
     ("FrogColors", "1"),
     ("FrogIcons", "1"),
