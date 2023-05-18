@@ -227,6 +227,12 @@ static void update_state(UIState *s) {
     scene.longitudinal_control = sm["carParams"].getCarParams().getOpenpilotLongitudinalControl();
   }
   if (sm.updated("carState")) {
+    if (scene.frog_signals) {
+      scene.blindspot_left = sm["carState"].getCarState().getLeftBlindspot();
+      scene.blindspot_right = sm["carState"].getCarState().getRightBlindspot();
+      scene.turn_signal_left = sm["carState"].getCarState().getLeftBlinker();
+      scene.turn_signal_right = sm["carState"].getCarState().getRightBlinker();
+    }
     if (scene.rotating_wheel) {
       scene.steering_angle_deg = (int)sm["carState"].getCarState().getSteeringAngleDeg();
     }
@@ -256,6 +262,7 @@ void ui_update_params(UIState *s) {
   const bool frog_theme = params.getBool("FrogTheme");
   scene.compass = params.getBool("Compass");
   scene.frog_colors = frog_theme && params.getBool("FrogColors");
+  scene.frog_signals = frog_theme && params.getBool("FrogSignals");
   scene.mute_dm = params.getBool("FireTheBabysitter") && params.getBool("MuteDM");
   scene.rotating_wheel = params.getBool("RotatingWheel");
   scene.wide_camera_disabled = params.getBool("WideCameraDisable");

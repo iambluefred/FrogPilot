@@ -122,6 +122,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"FrogColors", PERSISTENT},
     {"FrogIcons", PERSISTENT},
     {"FrogPilotTogglesUpdated", CLEAR_ON_MANAGER_START | CLEAR_ON_OFFROAD_TRANSITION},
+    {"FrogSignals", PERSISTENT},
     {"FrogSounds", PERSISTENT},
     {"FrogTheme", PERSISTENT},
     {"GitBranch", PERSISTENT},

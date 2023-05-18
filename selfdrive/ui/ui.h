@@ -128,13 +128,18 @@ typedef struct UIScene {
   bool compass;
   bool experimental_mode;
   bool frog_colors;
+  bool frog_signals;
   bool mute_dm;
   bool rotating_wheel;
   bool wide_camera_disabled;
   int bearing_deg;
+  int blindspot_left;
+  int blindspot_right;
   int screen_brightness;
   int steering_angle_deg;
   int steering_wheel;
+  int turn_signal_left;
+  int turn_signal_right;
   QPolygonF track_edge_vertices;
 
 } UIScene;
