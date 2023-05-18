@@ -22,6 +22,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"FireTheBabysitter", "Fire the Babysitter", "Disable some of openpilot's 'Babysitter Protocols'.", "../assets/offroad/icon_babysitter.png"},
     {"NudgelessLaneChange", "Nudgeless Lane Change", "Switch lanes without having to nudge the steering wheel.", "../assets/offroad/icon_lane.png"},
     {"NumericalTemp", "Numerical Temperature Gauge", "Replace openpilot's 'GOOD', 'OK', and 'HIGH' temperature statuses with numerical values.", "../assets/offroad/icon_temp.png"},
+    {"PersonalTune", "Personal Tune", "Enable the values of my personal tune which drives a bit more aggressively.", "../assets/offroad/icon_tune.png"},
     {"RotatingWheel", "Rotating Steering Wheel", "The steering wheel in top right corner of the onroad UI rotates alongside your physical steering wheel.", "../assets/offroad/icon_rotate.png"},
     {"ScreenBrightness", "Screen Brightness", "Choose a custom screen brightness level or use the default 'Auto' brightness setting.", "../assets/offroad/icon_light.png"},
     {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"},
@@ -63,6 +64,10 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
         {"LaneDetection", "Lane Detection", "Prevents automatic lane changes if no lane is detected to turn into. Helps prevent early lane changes such as preparing for an upcoming left/right turn."},
         {"OneLaneChange", "One Lane Change Per Signal", "Limits nudgeless lane changes to one per turn signal activation. Helps prevent lane changes when preparing for an upcoming left/right turn with no barrier between you and the other side of the road."},
       });
+    } else if (key == "PersonalTune") {
+      createSubControl(key, label, desc, icon, {}, {
+        {"ExperimentalPersonalTune", "Experimental Personal Tune", "An algorithm that I have developed that dynamically adjusts the following distance when approaching a slower lead vehicle, and then gradually increases it to emulate more human-like driving behavior. Work in progress; use at your own risk."},
+      });
     } else if (key == "ScreenBrightness") {
       mainLayout->addWidget(new ScreenBrightness());
       mainLayout->addWidget(horizontal_line());
@@ -79,6 +84,16 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
 ParamControl *FrogPilotPanel::createParamControl(const QString &key, const QString &label, const QString &desc, const QString &icon, QWidget *parent) {
   ParamControl *control = new ParamControl(key, label, desc, icon);
   connect(control, &ParamControl::toggleFlipped, [=](bool state) {
+    if (key == "PersonalTune") {
+      if (Params().getBool("PersonalTune")) {
+        ConfirmationDialog::toggleAlert("WARNING: This will reduce the following distance, increase acceleration, and modify openpilot's braking behavior!", "I understand the risks.", parent);
+      }
+    }
+    if (key == "ExperimentalPersonalTune") {
+      if (Params().getBool("ExperimentalPersonalTune")) {
+        ConfirmationDialog::toggleAlert("WARNING: This is EXTREMELY experimental and can cause the car to drive dangerously!", "I understand the risks.", parent);
+      }
+    }
     if (ConfirmationDialog::toggle("Reboot required to take effect.", "Reboot Now", parent)) {
       Hardware::reboot();
     }

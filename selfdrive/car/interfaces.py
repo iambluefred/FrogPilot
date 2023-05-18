@@ -92,7 +92,7 @@ class CarInterfaceBase(ABC):
     self.mute_seatbelt = fire_the_babysitter and params.get_bool("MuteSeatbelt")
 
   @staticmethod
-  def get_pid_accel_limits(CP, current_speed, cruise_speed):
+  def get_pid_accel_limits(CP, current_speed, cruise_speed, personal_tune):
     return ACCEL_MIN, ACCEL_MAX
 
   @classmethod
@@ -187,6 +187,8 @@ class CarInterfaceBase(ABC):
     # FrogPilot variables
     params = Params()
     ret.adjustableFollow = params.get_bool("AdjustableFollowDistance")
+    ret.experimentalPersonalTune = params.get_bool("PersonalTune") and params.get_bool("ExperimentalPersonalTune")
+    ret.personalTune = params.get_bool("PersonalTune")
     return ret
 
   @staticmethod
@@ -241,7 +243,7 @@ class CarInterfaceBase(ABC):
     return reader
 
   @abstractmethod
-  def apply(self, c: car.CarControl, now_nanos: int) -> Tuple[car.CarControl.Actuators, List[bytes]]:
+  def apply(self, c: car.CarControl, now_nanos: int, personal_tune: bool) -> Tuple[car.CarControl.Actuators, List[bytes]]:
     pass
 
   def create_common_events(self, cs_out, extra_gears=None, pcm_enable=True, allow_enable=True,
