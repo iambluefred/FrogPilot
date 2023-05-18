@@ -120,7 +120,7 @@ void OnroadWindow::mousePressEvent(QMouseEvent* e) {
   } else if (recentlyTapped && isExperimentalModewheel) {
     bool experimentalMode = params.getBool("ExperimentalMode");
     if (scene.conditional_experimental) {
-      params.putInt("ExperimentalModeOverride", scene.experimental_mode_override != 0 ? 0 : experimentalMode ? 1 : 2);
+      params.putInt("ConditionalStatus", (scene.conditional_status == 1 || scene.conditional_status == 2) ? 0 : experimentalMode ? 1 : 2);
     } else {
       params.putBool("ExperimentalMode", !experimentalMode);
     }

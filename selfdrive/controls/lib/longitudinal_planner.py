@@ -234,7 +234,7 @@ class LongitudinalPlanner:
         if carState.steeringWheelCar:
           overridden = carState.conditionalOverridden
         else:
-          overridden = self.params.get_int("ExperimentalModeOverride")
+          overridden = self.params.get_int("ConditionalStatus")
       else:
         overridden = 0
 
@@ -262,7 +262,10 @@ class LongitudinalPlanner:
         self.new_experimental_mode = False
 
       # Set parameter for on-road status bar
-      status_value = 1 if overridden == 1 and not carState.steeringWheelCar else 2 if overridden == 2 and not carState.steeringWheelCar else 3 if signal else 4 if stop_light_detected else 5 if self.curve else 6 if speed and not lead else 7 if speed else 0
+      if (overridden in [1, 2]) and not carState.steeringWheelCar:
+        status_value = overridden
+      else:
+        status_value = 3 if signal else 4 if stop_light_detected else 5 if self.curve else 6 if speed and not lead else 7 if speed else 0
       # Update status value if it has changed
       if status_value != self.previous_status_value:
         self.params.put_int("ConditionalStatus", status_value)

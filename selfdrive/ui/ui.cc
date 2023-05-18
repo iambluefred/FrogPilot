@@ -290,9 +290,6 @@ void ui_live_update_params(UIState *s) {
   // FrogPilot variables that need to be updated live
   if (scene.conditional_experimental) {
     scene.conditional_status = params.getInt("ConditionalStatus");
-    if (scene.experimental_mode_via_wheel && !scene.steering_wheel_car) {
-      scene.experimental_mode_override = params.getInt("ExperimentalModeOverride");
-    }
   }
   // FrogPilot variables that need to be updated whenever the user changes its toggle value
   if (params.getBool("FrogPilotTogglesUpdated")) {

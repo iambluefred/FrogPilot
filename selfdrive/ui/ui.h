@@ -146,7 +146,6 @@ typedef struct UIScene {
   int conditional_speed;
   int conditional_speed_lead;
   int conditional_status;
-  int experimental_mode_override;
   int screen_brightness;
   int steering_angle_deg;
   int steering_wheel;
