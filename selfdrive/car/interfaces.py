@@ -90,6 +90,7 @@ class CarInterfaceBase(ABC):
     fire_the_babysitter = params.get_bool("FireTheBabysitter")
     self.mute_door = fire_the_babysitter and params.get_bool("MuteDoor")
     self.mute_seatbelt = fire_the_babysitter and params.get_bool("MuteSeatbelt")
+    self.steerUnavailablePrev = False
 
   @staticmethod
   def get_pid_accel_limits(CP, current_speed, cruise_speed, personal_tune):
@@ -308,8 +309,11 @@ class CarInterfaceBase(ABC):
     else:
       self.no_steer_warning = False
       self.silent_steer_warning = False
-    if cs_out.steerFaultPermanent:
+    # Prevent LKAS fault alert upon startup when "Always On Lateral" is toggled on
+    if cs_out.steerFaultPermanent and self.steerUnavailablePrev:
       events.add(EventName.steerUnavailable)
+    elif cs_out.steerFaultPermanent:
+      self.steerUnavailablePrev = True
 
     # we engage when pcm is active (rising edge)
     # enabling can optionally be blocked by the car interface

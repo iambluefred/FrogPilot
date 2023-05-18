@@ -175,6 +175,9 @@ class CarState(CarStateBase):
       self.steeringWheelCarSet = True
     ret.steeringWheelCar = self.steeringWheelCarSet
 
+    # Allows the use of "Always On Lateral" if the user has the toggle on
+    ret.alwaysOnLateral = ret.cruiseState.available
+
     ret.genericToggle = bool(cp.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
     ret.espDisabled = cp.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
 

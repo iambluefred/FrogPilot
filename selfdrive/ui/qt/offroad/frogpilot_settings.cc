@@ -14,6 +14,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
   const std::vector<std::tuple<QString, QString, QString, QString>> toggles = {
     {"FrogTheme", "FrogPilot Theme", "Enable the beloved FrogPilot Theme! Disable toggle to revert back to the stock openpilot theme.", "../assets/images/frog_button_home.png"},
     {"AdjustableFollowDistance", "Adjustable Follow Distance", "Enable FrogPilot's follow distance profiles using the 'Distance' button on the steering wheel (Toyota/Lexus Only) or via the onroad UI for other makes.\n\n1 bar = Aggressive\n2 bars = Comfort\n3 bars = Relaxed", "../assets/offroad/icon_distance.png"},
+    {"AlwaysOnLateral", "Always on Lateral (Toyota/Lexus Only)", "Enable 'Always On Lateral' to keep openpilot lateral control when using either the brake or gas pedals. openpilot is only disengaged by deactivating the 'Cruise Control' button.", "../assets/offroad/icon_disengage_on_accelerator.svg"},
     {"Compass", "Compass", "Compass that rotates according to your driving direction.", "../assets/offroad/icon_compass.png"},
     {"ConditionalExperimentalMode", "Conditional Experimental Mode", "Automatically activate 'Experimental Mode' based on specified conditions.", "../assets/offroad/icon_conditional.png"},
     {"CustomRoadUI", "Custom Road UI", "Customize the road UI to your liking.", "../assets/offroad/icon_road.png"},

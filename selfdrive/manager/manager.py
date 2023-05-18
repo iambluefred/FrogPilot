@@ -38,6 +38,7 @@ def manager_init() -> None:
   default_params: List[Tuple[str, Union[str, bytes]]] = [
     ("AdjustableFollowDistance", "1"),
     ("AdjustableFollowDistanceProfile", "2"),
+    ("AlwaysOnLateral", "0"),
     ("Compass", "1"),
     ("CompletedTrainingVersion", "0"),
     ("ConditionalExperimentalMode", "1"),

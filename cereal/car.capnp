@@ -219,6 +219,7 @@ struct CarState {
   
   # FrogPilot CarStates
   adjustableFollowCar @46 :Bool;
+  alwaysOnLateral @47 :Bool;
   conditionalOverridden @48 :UInt8;
   distanceLines @49 :UInt8;
   steeringWheelCar @50 :Bool;
