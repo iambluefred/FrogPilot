@@ -656,6 +656,7 @@ void AnnotatedCameraWidget::drawLaneLines(QPainter &painter, const UIState *s) {
 
   const UIScene &scene = s->scene;
   SubMaster &sm = *(s->sm);
+  static auto params = Params();
 
   // lanelines
   for (int i = 0; i < std::size(scene.lane_line_vertices); ++i) {
@@ -687,10 +688,11 @@ void AnnotatedCameraWidget::drawLaneLines(QPainter &painter, const UIState *s) {
     float path_hue, saturation, lightness, alpha;
 
     if (frogColors) {
-      path_hue = fmax(fmin(60 + acceleration[i] * 35, 120), 0);
+      int acceleration_test = params.getBool("PathColorTesting");
+      path_hue = fmax(fmin(60 + acceleration_test * 35, 120), 0);
       path_hue = int(path_hue * 100 + 0.5) / 100;
 
-      saturation = fmin(fabs(acceleration[i] * 1.5), 1);
+      saturation = fmin(fabs(acceleration_test * 1.5), 1);
       lightness = util::map_val(saturation, 0.0f, 1.0f, 0.95f, 0.62f);
       alpha = util::map_val(lin_grad_point, 0.75f / 2.f, 0.75f, 0.4f, 0.0f);
     } else {

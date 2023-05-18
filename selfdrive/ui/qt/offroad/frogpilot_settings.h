@@ -118,6 +118,11 @@ ParamControllerFloat(LaneLinesWidth, "LaneLinesWidth", "   Lane Line Width", "Cu
   return std::clamp(v, 0.f, 24.f);
 )
 
+ParamControllerInt(PathColorTesting, "PathColorTesting", "Path Color Testing", "Sets the color hue for testing the path color.", "../assets/offroad/icon_blank.png",
+  return QString::number(params.getInt("PathColorTesting"));,
+  return std::clamp(v, -1000, 1000);
+)
+
 ParamControllerInt(PathEdgeWidth, "PathEdgeWidth", "   Path Edge Width", "Customize the path edge width that displays current driving statuses. Default is 20% of the total path.", "../assets/offroad/icon_blank.png",
   return QString::number(params.getInt("PathEdgeWidth")) + "%";,
   return std::clamp(v, 0, 100);

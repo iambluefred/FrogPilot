@@ -25,6 +25,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"FireTheBabysitter", "Fire the Babysitter", "Disable some of openpilot's 'Babysitter Protocols'.", "../assets/offroad/icon_babysitter.png"},
     {"NudgelessLaneChange", "Nudgeless Lane Change", "Switch lanes without having to nudge the steering wheel.", "../assets/offroad/icon_lane.png"},
     {"NumericalTemp", "Numerical Temperature Gauge", "Replace openpilot's 'GOOD', 'OK', and 'HIGH' temperature statuses with numerical values.", "../assets/offroad/icon_temp.png"},
+    {"PathColorTesting", "Path Color Testing", "Sets the color hue for testing the path color.", "../assets/offroad/icon_blank.png"},
     {"PersonalTune", "Personal Tune", "Enable the values of my personal tune which drives a bit more aggressively.", "../assets/offroad/icon_tune.png"},
     {"RotatingWheel", "Rotating Steering Wheel", "The steering wheel in top right corner of the onroad UI rotates alongside your physical steering wheel.", "../assets/offroad/icon_rotate.png"},
     {"ScreenBrightness", "Screen Brightness", "Choose a custom screen brightness level or use the default 'Auto' brightness setting.", "../assets/offroad/icon_light.png"},
@@ -77,6 +78,9 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
         {"LaneDetection", "Lane Detection", "Prevents automatic lane changes if no lane is detected to turn into. Helps prevent early lane changes such as preparing for an upcoming left/right turn."},
         {"OneLaneChange", "One Lane Change Per Signal", "Limits nudgeless lane changes to one per turn signal activation. Helps prevent lane changes when preparing for an upcoming left/right turn with no barrier between you and the other side of the road."},
       });
+    } else if (key == "PathColorTesting") {
+      mainLayout->addWidget(new PathColorTesting());
+      mainLayout->addWidget(horizontal_line());
     } else if (key == "PersonalTune") {
       createSubControl(key, label, desc, icon, {}, {
         {"ExperimentalPersonalTune", "Experimental Personal Tune", "An algorithm that I have developed that dynamically adjusts the following distance when approaching a slower lead vehicle, and then gradually increases it to emulate more human-like driving behavior. Work in progress; use at your own risk."},
