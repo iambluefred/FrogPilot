@@ -53,6 +53,7 @@ def manager_init() -> None:
     ("ScreenBrightness", "100"),
     ("Sidebar", "1"),
     ("SilentMode", "0"),
+    ("WideCameraDisable", "1"),
   ]
   if not PC:
     default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))
