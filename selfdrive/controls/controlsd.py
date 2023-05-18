@@ -857,7 +857,11 @@ class Controls:
     self.is_metric = self.params.get_bool("IsMetric")
     if self.CP.openpilotLongitudinalControl:
       if self.conditional_experimental_mode:
-        self.experimental_mode = self.sm['longitudinalPlan'].conditionalExperimentalMode
+        override = self.sm['carState'].conditionalOverridden
+        if override in (1, 2):
+          self.experimental_mode = False if override == 1 else True
+        else:
+          self.experimental_mode = self.sm['longitudinalPlan'].conditionalExperimentalMode
       else:
         self.experimental_mode = self.params.get_bool("ExperimentalMode")
 
