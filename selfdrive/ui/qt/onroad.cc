@@ -289,6 +289,9 @@ void AnnotatedCameraWidget::updateState(const UIState &s) {
 
   // DM icon transition
   dm_fade_state = fmax(0.0, fmin(1.0, dm_fade_state+0.2*(0.5-(float)(dmActive))));
+
+  // FrogPilot properties
+  setProperty("experimentalMode", s.scene.experimental_mode);
 }
 
 void AnnotatedCameraWidget::drawHud(QPainter &p) {
@@ -513,7 +516,7 @@ void AnnotatedCameraWidget::drawLaneLines(QPainter &painter, const UIState *s) {
 
   // paint path
   QLinearGradient bg(0, height(), 0, 0);
-  if (sm["controlsState"].getControlsState().getExperimentalMode()) {
+  if (experimentalMode) {
     // The first half of track_vertices are the points for the right side of the path
     // and the indices match the positions of accel from uiPlan
     const auto &acceleration = sm["uiPlan"].getUiPlan().getAccel();

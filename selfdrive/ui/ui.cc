@@ -200,6 +200,9 @@ static void update_state(UIState *s) {
   if (sm.updated("carParams")) {
     scene.longitudinal_control = sm["carParams"].getCarParams().getOpenpilotLongitudinalControl();
   }
+  if (sm.updated("controlsState")) {
+    scene.experimental_mode = sm["controlsState"].getControlsState().getExperimentalMode();
+  }
   if (sm.updated("wideRoadCameraState")) {
     float scale = (sm["wideRoadCameraState"].getWideRoadCameraState().getSensor() == cereal::FrameData::ImageSensor::AR0231) ? 6.0f : 1.0f;
     scene.light_sensor = std::max(100.0f - scale * sm["wideRoadCameraState"].getWideRoadCameraState().getExposureValPercent(), 0.0f);
@@ -209,8 +212,18 @@ static void update_state(UIState *s) {
 
 void ui_update_params(UIState *s) {
   auto params = Params();
+  UIScene &scene = s->scene;
   s->scene.is_metric = params.getBool("IsMetric");
   s->scene.map_on_left = params.getBool("NavSettingLeftSide");
+}
+
+void ui_live_update_params(UIState *s) {
+  static auto params = Params();
+  UIScene &scene = s->scene;
+  // FrogPilot variables that need to be updated live
+  // FrogPilot variables that need to be updated whenever the user changes its toggle value
+  if (params.getBool("FrogPilotTogglesUpdated")) {
+  }
 }
 
 void UIState::updateStatus() {
@@ -238,6 +251,9 @@ void UIState::updateStatus() {
     started_prev = scene.started;
     emit offroadTransition(!scene.started);
   }
+
+  // Update the live paramaters
+  ui_live_update_params(uiState());
 }
 
 UIState::UIState(QObject *parent) : QObject(parent) {

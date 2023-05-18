@@ -61,6 +61,9 @@ class AnnotatedCameraWidget : public CameraWidget {
   Q_PROPERTY(bool rightHandDM MEMBER rightHandDM);
   Q_PROPERTY(int status MEMBER status);
 
+  // FrogPilot properties
+  Q_PROPERTY(bool experimentalMode MEMBER experimentalMode);
+
 public:
   explicit AnnotatedCameraWidget(VisionStreamType type, QWidget* parent = 0);
   void updateState(const UIState &s);
@@ -89,6 +92,9 @@ private:
 
   int skip_frame_count = 0;
   bool wide_cam_requested = false;
+
+  // FrogPilot variables
+  bool experimentalMode;
 
 protected:
   void paintGL() override;
