@@ -133,6 +133,7 @@ typedef struct UIScene {
   int screen_brightness;
   int steering_angle_deg;
   int steering_wheel;
+  QPolygonF track_edge_vertices;
 
 } UIScene;
 
