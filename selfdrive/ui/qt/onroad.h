@@ -64,6 +64,7 @@ class AnnotatedCameraWidget : public CameraWidget {
   // FrogPilot properties
   Q_PROPERTY(bool experimentalMode MEMBER experimentalMode);
   Q_PROPERTY(bool frogColors MEMBER frogColors);
+  Q_PROPERTY(bool muteDM MEMBER muteDM);
 
 public:
   explicit AnnotatedCameraWidget(VisionStreamType type, QWidget* parent = 0);
@@ -97,6 +98,7 @@ private:
   // FrogPilot variables
   bool experimentalMode;
   bool frogColors;
+  bool muteDM;
 
 protected:
   void paintGL() override;

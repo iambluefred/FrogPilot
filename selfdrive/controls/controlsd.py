@@ -115,8 +115,10 @@ class Controls:
     passive = self.params.get_bool("Passive") or not openpilot_enabled_toggle
     
     # FrogPilot variables
+    fire_the_babysitter = self.params.get_bool("FireTheBabysitter")
     frog_theme = self.params.get_bool("FrogTheme")
     self.frog_sounds = frog_theme and self.params.get_bool("FrogSounds")
+    self.mute_overheat = fire_the_babysitter and self.params.get_bool("MuteSystemOverheat")
 
     # detect sound card presence and ensure successful init
     sounds_available = HARDWARE.get_sound_card_online()
@@ -261,7 +263,7 @@ class Controls:
       self.events.add_from_msg(CS.events)
 
     # Create events for temperature, disk space, and memory
-    if self.sm['deviceState'].thermalStatus >= ThermalStatus.red:
+    if self.sm['deviceState'].thermalStatus >= ThermalStatus.red and not self.mute_overheat:
       self.events.add(EventName.overheat)
     if self.sm['deviceState'].freeSpacePercent < 7 and not SIMULATION:
       # under 7% of space free no enable allowed
