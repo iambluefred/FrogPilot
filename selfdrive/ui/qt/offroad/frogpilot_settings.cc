@@ -17,6 +17,7 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
     {"DisableAd", "Disable comma prime Ad", "Hides the comma prime ad.", "../assets/offroad/icon_minus.png"},
     {"DisableInternetCheck", "Disable Internet Check", "Allows the device to remain offline indefinitely.", "../assets/offroad/icon_warning.png"},
     {"FireTheBabysitter", "Fire the Babysitter", "Disable some of openpilot's 'Babysitter Protocols'.", "../assets/offroad/icon_babysitter.png"},
+    {"NudgelessLaneChange", "Nudgeless Lane Change", "Switch lanes without having to nudge the steering wheel.", "../assets/offroad/icon_lane.png"},
     {"NumericalTemp", "Numerical Temperature Gauge", "Replace openpilot's 'GOOD', 'OK', and 'HIGH' temperature statuses with numerical values.", "../assets/offroad/icon_temp.png"},
     {"ScreenBrightness", "Screen Brightness", "Choose a custom screen brightness level or use the default 'Auto' brightness setting.", "../assets/offroad/icon_light.png"},
     {"Sidebar", "Sidebar Shown By Default", "Sidebar is shown by default while onroad as opposed to hidden.", "../assets/offroad/icon_metric.png"},
@@ -41,6 +42,11 @@ FrogPilotPanel::FrogPilotPanel(QWidget *parent) : QWidget(parent) {
         {"MuteDoor", "Mute 'Door Open' alert", "Mutes the 'Door Open' alert."},
         {"MuteSeatbelt", "Mute 'Seatbelt Unlatched' alert", "Mutes the 'Seatbelt Unlatched' alert."},
         {"MuteSystemOverheat", "Mute 'System Overheated' alert", "Mutes the 'System Overheated' alert."}
+      });
+    } else if (key == "NudgelessLaneChange") {
+      createSubControl(key, label, desc, icon, {}, {
+        {"LaneDetection", "Lane Detection", "Prevents automatic lane changes if no lane is detected to turn into. Helps prevent early lane changes such as preparing for an upcoming left/right turn."},
+        {"OneLaneChange", "One Lane Change Per Signal", "Limits nudgeless lane changes to one per turn signal activation. Helps prevent lane changes when preparing for an upcoming left/right turn with no barrier between you and the other side of the road."},
       });
     } else if (key == "ScreenBrightness") {
       mainLayout->addWidget(new ScreenBrightness());
