@@ -2,6 +2,7 @@
 
 #include <QFontDatabase>
 
+#include "common/params.h"
 #include "system/hardware/hw.h"
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
@@ -63,6 +64,10 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     }
   )");
   setAttribute(Qt::WA_NoSystemBackground);
+
+  // FrogPilot variables
+  static auto params = Params();
+  displaySidebar = params.getBool("Sidebar");
 }
 
 void MainWindow::openSettings(int index, const QString &param) {
@@ -74,7 +79,7 @@ void MainWindow::closeSettings() {
   main_layout->setCurrentWidget(homeWindow);
 
   if (uiState()->scene.started) {
-    homeWindow->showSidebar(false);
+    homeWindow->showSidebar(displaySidebar);
   }
 }
 
