@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QProcess>
 
 #include "common/params.h"
 #include "common/util.h"
@@ -47,6 +48,7 @@ AbstractAlert::AbstractAlert(bool hasRebootBtn, QWidget *parent) : QFrame(parent
       QDateTime currentDateTime = QDateTime::currentDateTime();
       QString currentDateTimeStr = currentDateTime.toString("MMMM d, yyyy - h:mma");
       params.put("Updated", currentDateTimeStr.toStdString());
+      QProcess::execute("rm -f /data/openpilot/prebuilt"); // Remove the prebuilt file when installing updates
       Hardware::reboot();
     });
   }
